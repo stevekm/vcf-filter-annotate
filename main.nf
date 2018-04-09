@@ -1,4 +1,5 @@
-Channel.from( [ ['HaplotypeCaller', 'NC-HAPMAP', file("input/NC-HAPMAP.GATKHC.vcf")] ] )
+Channel.from( [ ['HaplotypeCaller', 'NC-HAPMAP', file("input/NC-HAPMAP.GATKHC.vcf")],
+                ['LoFreq', 'NC-HAPMAP', file("input/NC-HAPMAP.LoFreq.vcf")] ] )
         .set { sample_variants }
 Channel.fromPath("ref/iGenomes/Homo_sapiens/UCSC/hg19/Sequence/WholeGenomeFasta/genome.fa")
         .into { ref_fasta; ref_fasta2; ref_fasta3 }
@@ -17,8 +18,8 @@ Channel.fromPath("${params.ANNOVAR_DB_DIR}").set { annovar_db_dir }
 // # 5. merge annotations with .tsv (.hg19_multianno.txt, recalc.tsv -> ... )
 
 process normalize_vcf {
-    tag "${sampleID}"
-    publishDir "${params.output_dir}/normalize_vcf", mode: 'copy', overwrite: true
+    tag "${caller}-${sampleID}"
+    publishDir "${params.output_dir}/${caller}", mode: 'copy', overwrite: true
 
     input:
     set val(caller), val(sampleID), file(sample_vcf), file(ref_fasta) from sample_variants.combine(ref_fasta)
@@ -38,7 +39,7 @@ process normalize_vcf {
 }
 
 process check_normalization {
-    tag "${sampleID}"
+    tag "${caller}-${sampleID}"
     echo true
 
     input:
@@ -46,14 +47,14 @@ process check_normalization {
 
     script:
     """
-    grep '6676635' "${sample_vcf}"
+    echo "[check_normalization] ['${caller}-${sampleID}'] \$(grep '6676635' '${sample_vcf}')"
     """
 }
 
 
 process filter_vcf {
     tag "${caller}-${sampleID}"
-    publishDir "${params.output_dir}/filter_vcf", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/${caller}", mode: 'copy', overwrite: true
     echo true
 
     input:
@@ -78,13 +79,22 @@ process filter_vcf {
             -select "vc.getGenotype('${sampleID}').getDP() > 0" \
             > "${sampleID}.norm.filtered.vcf"
         """
+    else if( caller == 'LoFreq' )
+        """
+        # do not report if frequency is less than 1%
+        gatk.sh -T SelectVariants \
+                -R "${ref_fasta}" \
+                -V "${sample_vcf}" \
+                -select "AF > 0.01"  \
+                > "${sampleID}.norm.filtered.vcf"
+        """
     else
         error "Invalid caller: ${caller}"
 }
 
 process vcf_2_tsv {
     tag "${caller}-${sampleID}"
-    publishDir "${params.output_dir}/vcf_2_tsv", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/${caller}", mode: 'copy', overwrite: true
 
     input:
     set val(caller), val(sampleID), file(sample_vcf), file(ref_fasta), file(ref_fai), file(ref_dict) from filtered_vcfs.combine(ref_fasta3).combine(ref_fai3).combine(ref_dict3)
@@ -102,13 +112,21 @@ process vcf_2_tsv {
         -GF AD -GF DP \
         -o "${sampleID}.norm.filtered.tsv"
         """
+    else if( caller == 'LoFreq' )
+        """
+        gatk.sh -T VariantsToTable \
+        -R "${ref_fasta}" \
+        -V "${sample_vcf}" \
+        -F CHROM -F POS -F ID -F REF -F ALT -F QUAL -F FILTER -F DP -F AF -F SB -F INDEL -F CONSVAR -F HRUN \
+        -o "${sampleID}.norm.filtered.tsv"
+        """
     else
         error "Invalid caller: ${caller}"
 }
 
 process recalc_tsv {
     tag "${caller}-${sampleID}"
-    publishDir "${params.output_dir}/recalc_tsv", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/${caller}", mode: 'copy', overwrite: true
 
     input:
     set val(caller), val(sampleID), file(sample_tsv) from vcf_tsvs
@@ -121,13 +139,17 @@ process recalc_tsv {
         """
         recalc-vcf-AF.py -c GATKHC -s "${sampleID}" -i "${sample_tsv}" -o "${sampleID}.norm.filtered.recalc.tsv"
         """
+    else if( caller == 'LoFreq' )
+        """
+        recalc-vcf-AF.py -c LoFreq -s "${sampleID}" -i "${sample_tsv}" -o "${sampleID}.norm.filtered.recalc.tsv"
+        """
     else
         error "Invalid caller: ${caller}"
 }
 
 process annotate_vcf {
     tag "${caller}-${sampleID}"
-    publishDir "${params.output_dir}/annotate_vcf", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/${caller}", mode: 'copy', overwrite: true
 
     input:
     set val(caller), val(sampleID), file(sample_vcf), file(annovar_db_dir) from filtered_vcfs2.combine(annovar_db_dir)
