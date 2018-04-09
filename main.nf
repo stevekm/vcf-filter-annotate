@@ -1,4 +1,4 @@
-Channel.from( [ ['HaplotypeCaller', 'NC-HAPMAP', file("input/NC-HAPMAP.original.vcf")] ] )
+Channel.from( [ ['HaplotypeCaller', 'NC-HAPMAP', file("input/NC-HAPMAP.GATKHC.vcf")] ] )
         .set { sample_variants }
 Channel.fromPath("ref/iGenomes/Homo_sapiens/UCSC/hg19/Sequence/WholeGenomeFasta/genome.fa")
         .into { ref_fasta; ref_fasta2; ref_fasta3 }
