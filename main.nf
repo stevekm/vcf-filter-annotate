@@ -1,12 +1,12 @@
 Channel.from( [ ['HaplotypeCaller', 'NC-HAPMAP', file("input/NC-HAPMAP.GATKHC.vcf")],
                 ['LoFreq', 'NC-HAPMAP', file("input/NC-HAPMAP.LoFreq.vcf")] ] )
         .set { sample_variants }
-Channel.fromPath("ref/iGenomes/Homo_sapiens/UCSC/hg19/Sequence/WholeGenomeFasta/genome.fa")
+Channel.fromPath("${params.ref_dir}/iGenomes/Homo_sapiens/UCSC/hg19/Sequence/WholeGenomeFasta/genome.fa")
         .into { ref_fasta; ref_fasta2; ref_fasta3 }
 
-Channel.fromPath("ref/iGenomes/Homo_sapiens/UCSC/hg19/Sequence/WholeGenomeFasta/genome.fa.fai")
+Channel.fromPath("${params.ref_dir}/iGenomes/Homo_sapiens/UCSC/hg19/Sequence/WholeGenomeFasta/genome.fa.fai")
         .into { ref_fai; ref_fai2; ref_fai3 }
-Channel.fromPath("ref/iGenomes/Homo_sapiens/UCSC/hg19/Sequence/WholeGenomeFasta/genome.dict")
+Channel.fromPath("${params.ref_dir}/iGenomes/Homo_sapiens/UCSC/hg19/Sequence/WholeGenomeFasta/genome.dict")
         .into { ref_dict; ref_dict2; ref_dict3 }
 Channel.fromPath("${params.ANNOVAR_DB_DIR}").set { annovar_db_dir }
 
