@@ -1,4 +1,4 @@
-Channel.from( [ ['NC-HAPMAP', file("input/NC-HAPMAP.original.vcf")] ] )
+Channel.from( [ ['HaplotypeCaller', 'NC-HAPMAP', file("input/NC-HAPMAP.original.vcf")] ] )
         .set { sample_variants }
 Channel.fromPath("ref/iGenomes/Homo_sapiens/UCSC/hg19/Sequence/WholeGenomeFasta/genome.fa")
         .into { ref_fasta; ref_fasta2; ref_fasta3 }
@@ -8,7 +8,6 @@ Channel.fromPath("ref/iGenomes/Homo_sapiens/UCSC/hg19/Sequence/WholeGenomeFasta/
 Channel.fromPath("ref/iGenomes/Homo_sapiens/UCSC/hg19/Sequence/WholeGenomeFasta/genome.dict")
         .into { ref_dict; ref_dict2; ref_dict3 }
 Channel.fromPath("${params.ANNOVAR_DB_DIR}").set { annovar_db_dir }
-variant_callers = ['HaplotypeCaller']
 
 // # 1. left normalize indels & split multiallelic entries (.vcf -> norm.vcf)
 // # 2. filtere vcf (norm.vcf -> .norm.filtered.vcf)
@@ -22,10 +21,10 @@ process normalize_vcf {
     publishDir "${params.output_dir}/normalize_vcf", mode: 'copy', overwrite: true
 
     input:
-    set val(sampleID), file(sample_vcf), file(ref_fasta) from sample_variants.combine(ref_fasta)
+    set val(caller), val(sampleID), file(sample_vcf), file(ref_fasta) from sample_variants.combine(ref_fasta)
 
     output:
-    set val(sampleID), file("${sampleID}.norm.vcf") into (normalized_variants, normalized_variants2)
+    set val(caller), val(sampleID), file("${sampleID}.norm.vcf") into (normalized_variants, normalized_variants2)
     file("${sampleID}.bcftools.multiallelics.stats.txt")
     file("${sampleID}.bcftools.realign.stats.txt")
 
@@ -43,7 +42,7 @@ process check_normalization {
     echo true
 
     input:
-    set val(sampleID), file(sample_vcf) from normalized_variants
+    set val(caller), val(sampleID), file(sample_vcf) from normalized_variants
 
     script:
     """
@@ -58,8 +57,7 @@ process filter_vcf {
     echo true
 
     input:
-    set val(sampleID), file(sample_vcf), file(ref_fasta), file(ref_fai), file(ref_dict) from normalized_variants2.combine(ref_fasta2).combine(ref_fai2).combine(ref_dict2)
-    each caller from variant_callers
+    set val(caller), val(sampleID), file(sample_vcf), file(ref_fasta), file(ref_fai), file(ref_dict) from normalized_variants2.combine(ref_fasta2).combine(ref_fai2).combine(ref_dict2)
 
     output:
     set val(caller), val(sampleID), file("${sampleID}.norm.filtered.vcf") into (filtered_vcfs, filtered_vcfs2)

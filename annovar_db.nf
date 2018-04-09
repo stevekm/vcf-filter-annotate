@@ -1,6 +1,3 @@
-params.ANNOVAR_DB_DIR = "annovar_db"
-params.ANNOVAR_BUILD_VERSION ="hg19"
-
 Channel.from(
     // [downdb_param, file_name_pattern, protocol_param]
     // ["1000g2015aug", "ALL.sites.2015_08.txt", "1000g2015aug_all"],

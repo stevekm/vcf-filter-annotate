@@ -1,2 +1,8 @@
 nextflow
 test.nf
+work
+output
+trace.txt
+flowchart.dot
+annovar_db/*
+.nextflow*
