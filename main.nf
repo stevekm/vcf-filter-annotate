@@ -1,5 +1,8 @@
 Channel.from( [ ['HaplotypeCaller', 'NC-HAPMAP', file("input/NC-HAPMAP.GATKHC.vcf")],
-                ['LoFreq', 'NC-HAPMAP', file("input/NC-HAPMAP.LoFreq.vcf")] ] )
+                ['LoFreq', 'NC-HAPMAP', file("input/NC-HAPMAP.LoFreq.vcf")],
+                ['HaplotypeCaller', 'SC-SERACARE', file("input/SC-SERACARE.GATKHC.vcf")],
+                ['LoFreq', 'SC-SERACARE', file("input/SC-SERACARE.LoFreq.vcf")]
+                ] )
         .set { sample_variants }
 Channel.fromPath("${params.ref_dir}/iGenomes/Homo_sapiens/UCSC/hg19/Sequence/WholeGenomeFasta/genome.fa")
         .into { ref_fasta; ref_fasta2; ref_fasta3 }
@@ -19,7 +22,7 @@ Channel.fromPath("${params.ANNOVAR_DB_DIR}").set { annovar_db_dir }
 
 process normalize_vcf {
     tag "${caller}-${sampleID}"
-    publishDir "${params.output_dir}/${caller}", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
 
     input:
     set val(caller), val(sampleID), file(sample_vcf), file(ref_fasta) from sample_variants.combine(ref_fasta)
@@ -54,14 +57,14 @@ process check_normalization {
 
 process filter_vcf {
     tag "${caller}-${sampleID}"
-    publishDir "${params.output_dir}/${caller}", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
     echo true
 
     input:
     set val(caller), val(sampleID), file(sample_vcf), file(ref_fasta), file(ref_fai), file(ref_dict) from normalized_variants2.combine(ref_fasta2).combine(ref_fai2).combine(ref_dict2)
 
     output:
-    set val(caller), val(sampleID), file("${sampleID}.norm.filtered.vcf") into (filtered_vcfs, filtered_vcfs2)
+    set val(caller), val(sampleID), file("${sampleID}.filtered.vcf") into (filtered_vcfs, filtered_vcfs2)
 
     script:
     if( caller == 'HaplotypeCaller' )
@@ -77,7 +80,10 @@ process filter_vcf {
             -select "vc.getGenotype('${sampleID}').getAD().1 / vc.getGenotype('${sampleID}').getDP() > 0.50" \
             -select "vc.getGenotype('${sampleID}').getAD().1 > 5" \
             -select "vc.getGenotype('${sampleID}').getDP() > 0" \
-            > "${sampleID}.norm.filtered.vcf"
+            > "${sampleID}.filtered.vcf"
+
+            # alternate allele freq (allele depth / depth) greater than 0.5
+            # -select "vc.getGenotype('${sampleID}').getAD().1 / vc.getGenotype('${sampleID}').getDP() > 0.50" \
         """
     else if( caller == 'LoFreq' )
         """
@@ -86,7 +92,7 @@ process filter_vcf {
                 -R "${ref_fasta}" \
                 -V "${sample_vcf}" \
                 -select "AF > 0.01"  \
-                > "${sampleID}.norm.filtered.vcf"
+                > "${sampleID}.filtered.vcf"
         """
     else
         error "Invalid caller: ${caller}"
@@ -94,13 +100,13 @@ process filter_vcf {
 
 process vcf_2_tsv {
     tag "${caller}-${sampleID}"
-    publishDir "${params.output_dir}/${caller}", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
 
     input:
     set val(caller), val(sampleID), file(sample_vcf), file(ref_fasta), file(ref_fai), file(ref_dict) from filtered_vcfs.combine(ref_fasta3).combine(ref_fai3).combine(ref_dict3)
 
     output:
-    set val(caller), val(sampleID), file("${sampleID}.norm.filtered.tsv") into vcf_tsvs
+    set val(caller), val(sampleID), file("${sampleID}.tsv") into vcf_tsvs
 
     script:
     if( caller == 'HaplotypeCaller' )
@@ -110,7 +116,7 @@ process vcf_2_tsv {
         -V "${sample_vcf}" \
         -F CHROM -F POS -F ID -F REF -F ALT -F FILTER -F QUAL -F AC -F AN \
         -GF AD -GF DP \
-        -o "${sampleID}.norm.filtered.tsv"
+        -o "${sampleID}.tsv"
         """
     else if( caller == 'LoFreq' )
         """
@@ -118,7 +124,7 @@ process vcf_2_tsv {
         -R "${ref_fasta}" \
         -V "${sample_vcf}" \
         -F CHROM -F POS -F ID -F REF -F ALT -F QUAL -F FILTER -F DP -F AF -F SB -F INDEL -F CONSVAR -F HRUN \
-        -o "${sampleID}.norm.filtered.tsv"
+        -o "${sampleID}.tsv"
         """
     else
         error "Invalid caller: ${caller}"
@@ -126,22 +132,22 @@ process vcf_2_tsv {
 
 process recalc_tsv {
     tag "${caller}-${sampleID}"
-    publishDir "${params.output_dir}/${caller}", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
 
     input:
     set val(caller), val(sampleID), file(sample_tsv) from vcf_tsvs
 
     output:
-    set val(caller), val(sampleID), file("${sampleID}.norm.filtered.recalc.tsv")
+    set val(caller), val(sampleID), file("${sampleID}.recalc.tsv") into samples_recalc_tsvs
 
     script:
     if( caller == 'HaplotypeCaller' )
         """
-        recalc-vcf-AF.py -c GATKHC -s "${sampleID}" -i "${sample_tsv}" -o "${sampleID}.norm.filtered.recalc.tsv"
+        recalc-vcf-AF.py -c GATKHC -s "${sampleID}" -i "${sample_tsv}" -o "${sampleID}.recalc.tsv"
         """
     else if( caller == 'LoFreq' )
         """
-        recalc-vcf-AF.py -c LoFreq -s "${sampleID}" -i "${sample_tsv}" -o "${sampleID}.norm.filtered.recalc.tsv"
+        recalc-vcf-AF.py -c LoFreq -s "${sampleID}" -i "${sample_tsv}" -o "${sampleID}.recalc.tsv"
         """
     else
         error "Invalid caller: ${caller}"
@@ -149,32 +155,64 @@ process recalc_tsv {
 
 process annotate_vcf {
     tag "${caller}-${sampleID}"
-    publishDir "${params.output_dir}/${caller}", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
 
     input:
     set val(caller), val(sampleID), file(sample_vcf), file(annovar_db_dir) from filtered_vcfs2.combine(annovar_db_dir)
 
     output:
-    file(annovar_output_file)
+    set val(caller), val(sampleID), file(annovar_output_txt), file(avinput_file) into samples_annotations
+    file(annovar_output_vcf)
+
+    when:
+    caller == 'HaplotypeCaller'
 
     script:
     avinput_file = "${sampleID}.avinput"
-    annovar_output_file = "${sampleID}.${params.ANNOVAR_BUILD_VERSION}_multianno.txt"
-    """
-    # convert to ANNOVAR format
-    convert2annovar.pl --format vcf4old --includeinfo "${sample_vcf}" --outfile "${avinput_file}"
+    annovar_output_txt = "${sampleID}.${params.ANNOVAR_BUILD_VERSION}_multianno.txt"
+    annovar_output_vcf = "${sampleID}.${params.ANNOVAR_BUILD_VERSION}_multianno.vcf"
+    if( caller == 'HaplotypeCaller' )
+        """
+        # convert to ANNOVAR format
+        # convert2annovar.pl --format vcf4old --includeinfo --comment "${sample_vcf}" --outfile "${avinput_file}"
+        # check number of lines between the files
+        # [ ! "\$( cat "${avinput_file}" | wc -l )" -eq "\$(grep -v '^#' "${sample_vcf}" | wc -l)" ] && echo "ERROR: number of entries does not match between files ${sample_vcf} and ${avinput_file}" && exit 1 || :
 
+        # annovate
+        table_annovar.pl "${sample_vcf}" "${annovar_db_dir}" \
+        --buildver "${params.ANNOVAR_BUILD_VERSION}" \
+        --remove \
+        --protocol "${params.ANNOVAR_PROTOCOL}" \
+        --operation "${params.ANNOVAR_OPERATION}" \
+        --nastring . \
+        --vcfinput \
+        --otherinfo \
+        --onetranscript \
+        --outfile "${sampleID}"
+        """
+    else
+        error "Invalid caller: ${caller}"
+}
 
-    # check number of lines between the files
-    [ ! "\$( cat "${avinput_file}" | wc -l )" -eq "\$(grep -v '^#' "${sample_vcf}" | wc -l)" ] && echo "ERROR: number of entries does not match between files ${sample_vcf} and ${avinput_file}" && exit 1 || :
+samples_annotations.join(samples_recalc_tsvs, by: [0,1]).tap { samples_annotations_tables }
 
-    # annovate
-    table_annovar.pl "${avinput_file}" "${annovar_db_dir}" \
-    --buildver "${params.ANNOVAR_BUILD_VERSION}" \
-    --remove \
-    --protocol "${params.ANNOVAR_PROTOCOL}" \
-    --operation "${params.ANNOVAR_OPERATION}" \
-    --nastring . \
-    --outfile "${sampleID}"
-    """
+process merge_annotation_tables {
+    tag "${caller}-${sampleID}"
+    publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
+
+    input:
+    set val(caller), val(sampleID), file(annovar_output_txt), file(avinput_file), file(recalc_tsv) from samples_annotations_tables
+
+    output:
+    file(output_file)
+
+    script:
+    output_file = "${sampleID}.annotation.tsv"
+    if( caller == 'HaplotypeCaller' )
+        """
+        # merge-ANNOVAR-tables-GATKHC.R sampleID recalc_tsv_file annovar_file avinput_file output_file
+        merge-ANNOVAR-tables-GATKHC.R "${sampleID}" "${recalc_tsv}" "${annovar_output_txt}" "${avinput_file}" "${output_file}"
+        """
+    else
+        error "Invalid caller: ${caller}"
 }

@@ -36,10 +36,10 @@ def GATKHC(fin, fout, sampleID):
     writer = csv.DictWriter(fout, delimiter = '\t', fieldnames = fieldnames)
     writer.writeheader()
     for row in reader:
-        # ref_AD = float(row[AD_key].split(',')[0])
+        ref_AD = float(row[AD_key].split(',')[0])
         alt_AD = float(row[AD_key].split(',')[1])
         depth = float(row[DP_key])
-        # ref_DP = round(ref_AD / depth, 4)
+        ref_DP = round(ref_AD / depth, 4)
         alt_AF = round(alt_AD / depth, 6)
         row['FREQ'] = alt_AF
         writer.writerow(row)
@@ -99,8 +99,8 @@ def main(**kwargs):
         print("ERROR: caller not recognized: {0}".format(caller))
         sys.exit(1)
 
-    
-    
+
+
 
 def parse():
     """
@@ -109,7 +109,7 @@ def parse():
     parser = argparse.ArgumentParser(description='Append a column of text to a file')
     parser.add_argument("-i", default = None, dest = 'input_file', help="Input file")
     parser.add_argument("-o", default = None, dest = 'output_file', help="Output file")
-    
+
     parser.add_argument("-c", "--caller", dest = 'caller', help="Variant caller used", required=True)
     parser.add_argument("-s", "--sampleID", dest = 'sampleID', help="Sample ID", required=True)
     args = parser.parse_args()
