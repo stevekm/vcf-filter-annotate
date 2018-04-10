@@ -9,6 +9,10 @@ install: ./nextflow
 update: ./nextflow
 	./nextflow self-update
 
+annovar: install
+	./nextflow run annovar_db.nf -profile local
+
+
 # ~~~~~ RUN PIPELINE ~~~~~ #
 test: install
 	./nextflow run test.nf
