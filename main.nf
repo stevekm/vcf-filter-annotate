@@ -1,9 +1,41 @@
-Channel.from( [ ['HaplotypeCaller', 'NC-HAPMAP', file("input/NC-HAPMAP.GATKHC.vcf")],
-                ['LoFreq', 'NC-HAPMAP', file("input/NC-HAPMAP.LoFreq.vcf")],
-                ['HaplotypeCaller', 'SC-SERACARE', file("input/SC-SERACARE.GATKHC.vcf")],
-                ['LoFreq', 'SC-SERACARE', file("input/SC-SERACARE.LoFreq.vcf")]
-                ] )
-        .set { sample_variants }
+// ~~~~~  PIPELINE FOR UNPAIRED FILES ~~~~~ //
+Channel.from( [
+            ['HaplotypeCaller', 'NC-HAPMAP', file("input/NC-HAPMAP.GATKHC.vcf.gz")],
+            ['LoFreq', 'NC-HAPMAP', file("input/NC-HAPMAP.LoFreq.vcf.gz")],
+            ['HaplotypeCaller', 'SC-SERACARE', file("input/SC-SERACARE.GATKHC.vcf.gz")],
+            ['LoFreq', 'SC-SERACARE', file("input/SC-SERACARE.LoFreq.vcf.gz")],
+            [ "LoFreq", "NTC-H2O", file("input/vcf_lofreq/NTC-H2O.vcf.gz") ],
+            [ "LoFreq", "HapMap-B17-1267", file("input/vcf_lofreq/HapMap-B17-1267.vcf.gz") ],
+            [ "LoFreq", "SeraCare-1to1", file("input/vcf_lofreq/SeraCare-1to1-Positive.vcf.gz") ],
+            [ "HaplotypeCaller", "NTC-H2O", file("input/vcf_hc/NTC-H2O.vcf.gz") ],
+            [ "HaplotypeCaller", "HapMap-B17-1267", file("input/vcf_hc/HapMap-B17-1267.vcf.gz") ],
+            [ "HaplotypeCaller", "SeraCare-1to1", file("input/vcf_hc/SeraCare-1to1-Positive.vcf.gz") ],
+            [ "MuTect2", "SeraCare-1to1.HapMap-B17-1267.chr8", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr8.vcf.gz") ],
+            [ "MuTect2", "SeraCare-1to1.HapMap-B17-1267.chr2", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr2.vcf.gz") ],
+            [ "MuTect2", "SeraCare-1to1.HapMap-B17-1267.chr5", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr5.vcf.gz") ],
+            [ "MuTect2", "SeraCare-1to1.HapMap-B17-1267.chr12", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr12.vcf.gz") ],
+            [ "MuTect2", "SeraCare-1to1.HapMap-B17-1267.chr3", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr3.vcf.gz") ],
+            [ "MuTect2", "SeraCare-1to1.HapMap-B17-1267.chr10", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr10.vcf.gz") ],
+            [ "MuTect2", "SeraCare-1to1.HapMap-B17-1267.chr20", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr20.vcf.gz") ],
+            [ "MuTect2", "SeraCare-1to1.HapMap-B17-1267.chr14", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr14.vcf.gz") ],
+            [ "MuTect2", "SeraCare-1to1.HapMap-B17-1267.chrX", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chrX.vcf.gz") ],
+            [ "MuTect2", "SeraCare-1to1.HapMap-B17-1267.chr13", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr13.vcf.gz") ],
+            [ "MuTect2", "SeraCare-1to1.HapMap-B17-1267.chr19", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr19.vcf.gz") ],
+            [ "MuTect2", "SeraCare-1to1.HapMap-B17-1267.chr22", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr22.vcf.gz") ],
+            [ "MuTect2", "SeraCare-1to1.HapMap-B17-1267.chr15", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr15.vcf.gz") ],
+            [ "MuTect2", "SeraCare-1to1.HapMap-B17-1267.chr9", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr9.vcf.gz") ],
+            [ "MuTect2", "SeraCare-1to1.HapMap-B17-1267.chr4", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr4.vcf.gz") ],
+            [ "MuTect2", "SeraCare-1to1.HapMap-B17-1267.chr7", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr7.vcf.gz") ],
+            [ "MuTect2", "SeraCare-1to1.HapMap-B17-1267.chr16", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr16.vcf.gz") ],
+            [ "MuTect2", "SeraCare-1to1.HapMap-B17-1267.chr17", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr17.vcf.gz") ],
+            [ "MuTect2", "SeraCare-1to1.HapMap-B17-1267.chr18", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr18.vcf.gz") ],
+            [ "MuTect2", "SeraCare-1to1.HapMap-B17-1267.chr11", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr11.vcf.gz") ],
+            [ "MuTect2", "SeraCare-1to1.HapMap-B17-1267.chr1", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr1.vcf.gz") ],
+            [ "MuTect2","SeraCare-1to1.HapMap-B17-1267.chrY", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chrY.vcf.gz") ],
+            [ "MuTect2", "SeraCare-1to1.HapMap-B17-1267.chr6", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr6.vcf.gz") ]
+            ] )
+        .set { sample_variants_zipped }
+
 Channel.fromPath("${params.ref_dir}/iGenomes/Homo_sapiens/UCSC/hg19/Sequence/WholeGenomeFasta/genome.fa")
         .into { ref_fasta; ref_fasta2; ref_fasta3 }
 
@@ -19,6 +51,22 @@ Channel.fromPath("${params.ANNOVAR_DB_DIR}").set { annovar_db_dir }
 // # 3. recalculate allele frequency (.tsv -> recalc.tsv)
 // # 4. annotate (norm.vcf -> .avinput, .hg19_multianno.txt)
 // # 5. merge annotations with .tsv (.hg19_multianno.txt, recalc.tsv -> ... )
+
+process unzip_samples {
+    tag "${caller}-${sampleID}"
+    publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
+
+    input:
+    set val(caller), val(sampleID), file(sample_vcf) from sample_variants_zipped
+
+    output:
+    set val(caller), val(sampleID), file("${sampleID}.vcf") into sample_variants
+
+    script:
+    """
+    gunzip -c "${sample_vcf}" > "${sampleID}.vcf"
+    """
+}
 
 process normalize_vcf {
     tag "${caller}-${sampleID}"
@@ -65,6 +113,9 @@ process filter_vcf {
 
     output:
     set val(caller), val(sampleID), file("${sampleID}.filtered.vcf") into (filtered_vcfs, filtered_vcfs2)
+
+    when:
+    caller != 'MuTect2'
 
     script:
     if( caller == 'HaplotypeCaller' )
@@ -216,3 +267,48 @@ process merge_annotation_tables {
     else
         error "Invalid caller: ${caller}"
 }
+
+
+
+
+// ~~~~~  PIPELINE FOR PAIRED FILES ~~~~~ //
+// Channel.from([
+//     // caller, tumorID, normalID, pairID, file
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr8.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr2.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr5.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr12.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr3.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr10.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr20.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr14.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chrX.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr13.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr19.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr22.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr21.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr15.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr9.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr4.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr7.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr16.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr17.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr18.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr11.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr1.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chrY.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "SeraCare-1to1.HapMap-B17-1267" file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr6.vcf.gz") ]
+//     ])
+//     .set { pairs_variants_zipped }
+//
+//
+// process unzip_pairs {
+//     tag "${caller}-${sampleID}"
+//     publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
+//
+//     input:
+//     set val(caller), val(sampleID), file(sample_vcf) from sample_variants_zipped
+//
+//     output:
+//     set val(caller), val(sampleID), file("${sampleID}.vcf") into sample_variants
+// }
