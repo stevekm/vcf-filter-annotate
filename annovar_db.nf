@@ -34,6 +34,11 @@ process make_ANNOVAR_db {
     script:
     output_name = "${params.ANNOVAR_BUILD_VERSION}_${output_file}"
     """
-    annotate_variation.pl -downdb -buildver ${params.ANNOVAR_BUILD_VERSION} -webfrom annovar "${downdb_param}" "${annovar_db_dir}"
+    annotate_variation.pl \
+    -downdb \
+    -buildver ${params.ANNOVAR_BUILD_VERSION} \
+    -webfrom annovar \
+    "${downdb_param}" \
+    "${annovar_db_dir}"
     """
 }

@@ -18,7 +18,5 @@ process make_ref {
 	tar -xvzf ref.tar.gz ref/iGenomes/Homo_sapiens/UCSC/hg19/Sequence/WholeGenomeFasta
 	rm -f ref.tar.gz
     mv ref/iGenomes .
-    ls -l
-    pwd
     """
 }

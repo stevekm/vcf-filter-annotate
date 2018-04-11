@@ -14,12 +14,12 @@ update: ./nextflow
 
 annovar_db: install
 	[ ! -d "$(ANNOVAR_DB_DIR)" ] && echo "> system ANNOVAR db dir does not exist, setting up local dir..." && { \
-	./nextflow run annovar_db.nf -profile local ; } || :
+	./nextflow run annovar_db.nf -profile ref ; } || :
 
 
 ref: install
 	[ ! -d "$(REFDIR)" ] && echo "> system ref dir doesnt exist, setting up local ref dir..." && { \
-	./nextflow run ref.nf -profile local ; } || :
+	./nextflow run ref.nf -profile ref ; } || :
 
 setup: annovar_db ref
 
