@@ -1,4 +1,7 @@
 SHELL:=/bin/bash
+REFDIR:=/ifs/data/sequence/results/external/NYU/snuderllab/ref
+ANNOVAR_DB_DIR:=/ifs/data/molecpathlab/bin/annovar/db/hg19
+.PHONY: annovar_db ref
 
 # ~~~~~ SETUP PIPELINE ~~~~~ #
 ./nextflow:
@@ -9,9 +12,16 @@ install: ./nextflow
 update: ./nextflow
 	./nextflow self-update
 
-annovar: install
-	./nextflow run annovar_db.nf -profile local
+annovar_db: install
+	[ ! -d "$(ANNOVAR_DB_DIR)" ] && echo "> system ANNOVAR db dir does not exist, setting up local dir..." && { \
+	./nextflow run annovar_db.nf -profile local ; } || :
 
+
+ref: install
+	[ ! -d "$(REFDIR)" ] && echo "> system ref dir doesnt exist, setting up local ref dir..." && { \
+	./nextflow run ref.nf -profile local ; } || :
+
+setup: annovar_db ref
 
 # ~~~~~ RUN PIPELINE ~~~~~ #
 test: install
