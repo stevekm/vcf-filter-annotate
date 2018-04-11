@@ -3,13 +3,13 @@ Channel.from( [
             ['HaplotypeCaller', 'NC-HAPMAP', file("input/NC-HAPMAP.GATKHC.vcf.gz")],
             ['LoFreq', 'NC-HAPMAP', file("input/NC-HAPMAP.LoFreq.vcf.gz")],
             ['HaplotypeCaller', 'SC-SERACARE', file("input/SC-SERACARE.GATKHC.vcf.gz")],
-            ['LoFreq', 'SC-SERACARE', file("input/SC-SERACARE.LoFreq.vcf.gz")],
-            [ "LoFreq", "NTC-H2O", file("input/vcf_lofreq/NTC-H2O.vcf.gz") ],
-            [ "LoFreq", "HapMap-B17-1267", file("input/vcf_lofreq/HapMap-B17-1267.vcf.gz") ],
-            [ "LoFreq", "SeraCare-1to1", file("input/vcf_lofreq/SeraCare-1to1-Positive.vcf.gz") ],
-            [ "HaplotypeCaller", "NTC-H2O", file("input/vcf_hc/NTC-H2O.vcf.gz") ],
-            [ "HaplotypeCaller", "HapMap-B17-1267", file("input/vcf_hc/HapMap-B17-1267.vcf.gz") ],
-            [ "HaplotypeCaller", "SeraCare-1to1", file("input/vcf_hc/SeraCare-1to1-Positive.vcf.gz") ]
+            ['LoFreq', 'SC-SERACARE', file("input/SC-SERACARE.LoFreq.vcf.gz")]
+            // [ "LoFreq", "NTC-H2O", file("input/vcf_lofreq/NTC-H2O.vcf.gz") ],
+            // [ "LoFreq", "HapMap-B17-1267", file("input/vcf_lofreq/HapMap-B17-1267.vcf.gz") ],
+            // [ "LoFreq", "SeraCare-1to1", file("input/vcf_lofreq/SeraCare-1to1-Positive.vcf.gz") ],
+            // [ "HaplotypeCaller", "NTC-H2O", file("input/vcf_hc/NTC-H2O.vcf.gz") ],
+            // [ "HaplotypeCaller", "HapMap-B17-1267", file("input/vcf_hc/HapMap-B17-1267.vcf.gz") ],
+            // [ "HaplotypeCaller", "SeraCare-1to1", file("input/vcf_hc/SeraCare-1to1-Positive.vcf.gz") ]
             ] )
         .set { sample_variants_zipped }
 
