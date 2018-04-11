@@ -17,10 +17,10 @@ cd vcf-filter-annotate
 
 __NOTE:__ local usage requires Docker to be running
 
-If you do not have ANNOVAR reference databases already downloaded, then first run the following to download them:
+The following command will check for the presence of known system locations for ANNOVAR databases and reference files, and download them if missing. 
 
 ```
-make annovar
+make setup
 ```
 
 ## Run
