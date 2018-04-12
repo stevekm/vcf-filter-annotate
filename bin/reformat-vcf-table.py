@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Recalculates the variant allele frequency for GATK Haplotype Caller output
+Reformats the .tsv vcf table output to recalculate and standardize values for downstream processing.
 
-INPUT: table-formatted .vcf output from GATK VariantsToTable
+INPUT: .TSV formatted output from GATK VariantsToTable
 OUTPUT: .TSV formatted table with recalculated variant allele frequency in the FREQ column
-USAGE: ./recalc-vcf-AF.py NC-HAPMAP.vcf.txt NC-HAPMAP GATKHC
+USAGE: reformat-vcf-table.py -c GATKHC -s "sampleID" -i "sample_tsv" -o "sampleID.recalc.tsv"
 """
 import csv
 import sys
@@ -15,6 +15,7 @@ def GATKHC(fin, fout, sampleID):
     """
     Recalculates the variant allele frequency for GATK Haplotype Caller output
     assumes VCFv4.2
+    Outputs extra columns using variant values
 
     Parameters
     ----------
@@ -33,15 +34,23 @@ def GATKHC(fin, fout, sampleID):
     reader = csv.DictReader(fin, delimiter = '\t')
     fieldnames = reader.fieldnames
     fieldnames.append('FREQ')
+    fieldnames.append('AD.REF')
+    fieldnames.append('AD.ALT')
+    fieldnames.append('AF.ALT')
+    fieldnames.append('AF.REF')
     writer = csv.DictWriter(fout, delimiter = '\t', fieldnames = fieldnames)
     writer.writeheader()
     for row in reader:
         ref_AD = float(row[AD_key].split(',')[0])
         alt_AD = float(row[AD_key].split(',')[1])
         depth = float(row[DP_key])
-        ref_DP = round(ref_AD / depth, 4)
+        ref_AF = round(ref_AD / depth, 6)
         alt_AF = round(alt_AD / depth, 6)
         row['FREQ'] = alt_AF
+        row['AD.REF'] = ref_AD
+        row['AD.ALT'] = alt_AD
+        row['AF.REF'] = ref_AF
+        row['AF.ALT'] = alt_AF
         writer.writerow(row)
 
 def LoFreq(fin, fout):
