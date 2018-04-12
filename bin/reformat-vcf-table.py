@@ -11,6 +11,12 @@ import csv
 import sys
 import argparse
 
+from signal import signal, SIGPIPE, SIG_DFL
+signal(SIGPIPE,SIG_DFL)
+"""
+https://stackoverflow.com/questions/14207708/ioerror-errno-32-broken-pipe-python
+"""
+
 def GATKHC(fin, fout, sampleID):
     """
     Recalculates the variant allele frequency for GATK Haplotype Caller output
@@ -38,19 +44,29 @@ def GATKHC(fin, fout, sampleID):
     fieldnames.append('AD.ALT')
     fieldnames.append('AF.ALT')
     fieldnames.append('AF.REF')
-    writer = csv.DictWriter(fout, delimiter = '\t', fieldnames = fieldnames)
+    fieldnames.append('DP')
+    fieldnames.append('AF')
+    fieldnames_out = [ item for item in fieldnames ]
+    fieldnames_out.remove(AD_key)
+    fieldnames_out.remove(DP_key)
+    writer = csv.DictWriter(fout, delimiter = '\t', fieldnames = fieldnames_out)
     writer.writeheader()
     for row in reader:
         ref_AD = float(row[AD_key].split(',')[0])
         alt_AD = float(row[AD_key].split(',')[1])
         depth = float(row[DP_key])
-        ref_AF = round(ref_AD / depth, 6)
-        alt_AF = round(alt_AD / depth, 6)
+        ref_AF = ref_AD / depth
+        alt_AF = alt_AD / depth
         row['FREQ'] = alt_AF
+        row['AF'] = alt_AF
         row['AD.REF'] = ref_AD
         row['AD.ALT'] = alt_AD
         row['AF.REF'] = ref_AF
         row['AF.ALT'] = alt_AF
+        row['DP'] = depth
+        drop_vals = []
+        drop_vals.append(row.pop(AD_key))
+        drop_vals.append(row.pop(DP_key))
         writer.writerow(row)
 
 def LoFreq(fin, fout):
@@ -96,7 +112,7 @@ def MuTect2(fin, fout):
     writer.writeheader()
     for row in reader:
         # set the FREQ to the tumor AF
-        tumor_AF_value = round(row[tumor_AF_key], 6)
+        tumor_AF_value = row[tumor_AF_key]
         row['FREQ'] = row['TUMOR.AF']
         # change QUAL to the TLOD
         row['QUAL'] = row['TLOD']

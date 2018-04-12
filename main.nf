@@ -15,25 +15,25 @@ Channel.from( [
 
 Channel.from([
     // caller, tumorID, normalID, chrom, file
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr8", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr8.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr2", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr2.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr5", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr5.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr12", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr12.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr3", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr3.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr10", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr10.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr20", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr20.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr14", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr14.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chrX", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chrX.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr13", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr13.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr19", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr19.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr22", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr22.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr21", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr21.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr15", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr15.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr9", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr9.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr4", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr4.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr7", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr7.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr16", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr16.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr17", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr17.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr8", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr8.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr2", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr2.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr5", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr5.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr12", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr12.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr3", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr3.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr10", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr10.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr20", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr20.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr14", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr14.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chrX", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chrX.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr13", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr13.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr19", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr19.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr22", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr22.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr21", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr21.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr15", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr15.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr9", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr9.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr4", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr4.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr7", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr7.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr16", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr16.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr17", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr17.vcf.gz") ],
 [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr18", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr18.vcf.gz") ],
 [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr11", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr11.vcf.gz") ],
 [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr1", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr1.vcf.gz") ],
@@ -124,9 +124,6 @@ process filter_vcf {
 
     output:
     set val(caller), val(sampleID), file("${sampleID}.filtered.vcf") into (filtered_vcfs, filtered_vcfs2)
-
-    // when:
-    // caller != 'MuTect2'
 
     script:
     if( caller == 'HaplotypeCaller' )
@@ -232,15 +229,48 @@ process recalc_tsv {
     script:
     if( caller == 'HaplotypeCaller' )
         """
-        reformat-vcf-table.py -c GATKHC -s "${sampleID}" -i "${sample_tsv}" -o "${sampleID}.recalc.tsv"
+        # reformat and adjust the TSV table
+        reformat-vcf-table.py -c GATKHC \
+        -s "${sampleID}" \
+        -i "${sample_tsv}" \
+        -o "${sampleID}.recalc.tmp"
+
+        # add a column with the sample ID
+        paste_col.py -i "${sampleID}.recalc.tmp" \
+        -o "${sampleID}.recalc.tsv" \
+        --header "SAMPLE" \
+        -v "${sampleID}" \
+        -d "\t"
+
         """
     else if( caller == 'LoFreq' )
         """
-        reformat-vcf-table.py -c LoFreq -s "${sampleID}" -i "${sample_tsv}" -o "${sampleID}.recalc.tsv"
+        reformat-vcf-table.py -c LoFreq \
+        -s "${sampleID}" \
+        -i "${sample_tsv}" \
+        -o "${sampleID}.recalc.tmp"
+
+        # add a column with the sample ID
+        paste_col.py -i "${sampleID}.recalc.tmp" \
+        -o "${sampleID}.recalc.tsv" \
+        --header "SAMPLE" \
+        -v "${sampleID}" \
+        -d "\t"
         """
     else if( caller == 'MuTect2' )
         """
-        reformat-vcf-table.py -c MuTect2 -s "${sampleID}" -i "${sample_tsv}" -o "${sampleID}.recalc.tsv"
+        reformat-vcf-table.py -c MuTect2 \
+        -s "${sampleID}" \
+        -i "${sample_tsv}" \
+        -o "${sampleID}.recalc.tmp"
+
+        # add a column with the sample ID
+        paste_col.py -i "${sampleID}.recalc.tmp" \
+        -o "${sampleID}.recalc.tsv" \
+        --header "SAMPLE" \
+        -v "${sampleID}" \
+        -d "\t"
+
         """
     else
         error "Invalid caller: ${caller}"
@@ -256,6 +286,7 @@ process annotate_vcf {
     output:
     set val(caller), val(sampleID), file(annovar_output_txt), file(avinput_file) into samples_annotations
     file(annovar_output_vcf)
+    set val(caller), val(sampleID), file(avinput_file) into samples_avinput
 
     script:
     avinput_file = "${sampleID}.avinput"
@@ -281,27 +312,49 @@ process annotate_vcf {
     // --otherinfo \
 }
 
-samples_annotations.join(samples_recalc_tsvs, by: [0,1]).tap { samples_annotations_tables }
-process merge_annotation_tables {
+process reformat_avinput {
     tag "${caller}-${sampleID}"
     publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
 
     input:
-    set val(caller), val(sampleID), file(annovar_output_txt), file(avinput_file), file(recalc_tsv) from samples_annotations_tables
-
-    output:
-    file(output_file)
+    set val(caller), val(sampleID), file(avinput_file) from samples_avinput
 
     when:
     caller == 'HaplotypeCaller'
 
+    output:
+    set val(caller), val(sampleID), file("${sampleID}.avinput.recalc.tsv")
+
     script:
-    output_file = "${sampleID}.annotation.tsv"
     if( caller == 'HaplotypeCaller' )
         """
-        # merge-ANNOVAR-tables-GATKHC.R sampleID recalc_tsv_file annovar_file avinput_file output_file
-        merge-ANNOVAR-tables-GATKHC.R "${sampleID}" "${recalc_tsv}" "${annovar_output_txt}" "${avinput_file}" "${output_file}"
+        # keep only the first columns and add headers
+        printf "Chr\tStart\tEnd\tRef\tAlt\tAF\tQUAL\tAD.ALT\tCHROM\tPOS\tID\tREF\tALT\n" > "${sampleID}.avinput.recalc.tsv"
+        cut -f1-13 ${avinput_file} >>  "${sampleID}.avinput.recalc.tsv"
         """
-    else
-        error "Invalid caller: ${caller}"
 }
+
+
+// samples_annotations.join(samples_recalc_tsvs, by: [0,1]).tap { samples_annotations_tables }
+// process merge_annotation_tables {
+//     tag "${caller}-${sampleID}"
+//     publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
+//
+//     input:
+//     set val(caller), val(sampleID), file(annovar_output_txt), file(avinput_file), file(recalc_tsv) from samples_annotations_tables
+//
+//     output:
+//     file(output_file)
+//
+//     when:
+//     caller == 'HaplotypeCaller'
+//
+//     script:
+//     output_file = "${sampleID}.annotation.tsv"
+//     if( caller == 'HaplotypeCaller' )
+//         """
+//         merge-ANNOVAR-tables-GATKHC.R "${sampleID}" "${recalc_tsv}" "${annovar_output_txt}" "${avinput_file}" "${output_file}"
+//         """
+//     else
+//         error "Invalid caller: ${caller}"
+// }
