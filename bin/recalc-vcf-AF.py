@@ -68,6 +68,32 @@ def LoFreq(fin, fout):
         row['FREQ'] = AF_val
         writer.writerow(row)
 
+def MuTect2(fin, fout):
+    """
+    Outputs the TUMOR.AF as a new column called 'FREQ', and outputs the TLOD value as QUAL
+
+    Parameters
+    ----------
+    fin: file connection
+        connection to the input file
+    fout: file connection
+        connection to the output file
+
+    """
+    reader = csv.DictReader(fin, delimiter = '\t')
+    fieldnames = reader.fieldnames
+    fieldnames.append('FREQ')
+    writer = csv.DictWriter(fout, delimiter = '\t', fieldnames = fieldnames)
+    writer.writeheader()
+    for row in reader:
+        # set the FREQ to the tumor AF
+        tumor_AF_value = round(row[tumor_AF_key], 6)
+        row['FREQ'] = row['TUMOR.AF']
+        # change QUAL to the TLOD
+        row['QUAL'] = row['TLOD']
+        writer.writerow(row)
+
+
 def main(**kwargs):
     """
     Main control function for the script
@@ -93,6 +119,10 @@ def main(**kwargs):
         fin.close()
     elif caller == "LoFreq":
         LoFreq(fin, fout)
+        fout.close()
+        fin.close()
+    elif caller == "MuTect2":
+        MuTect2(fin, fout)
         fout.close()
         fin.close()
     else:

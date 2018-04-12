@@ -125,8 +125,8 @@ process filter_vcf {
     output:
     set val(caller), val(sampleID), file("${sampleID}.filtered.vcf") into (filtered_vcfs, filtered_vcfs2)
 
-    when:
-    caller != 'MuTect2'
+    // when:
+    // caller != 'MuTect2'
 
     script:
     if( caller == 'HaplotypeCaller' )
@@ -154,6 +154,24 @@ process filter_vcf {
                 -R "${ref_fasta}" \
                 -V "${sample_vcf}" \
                 -select "AF > 0.01"  \
+                > "${sampleID}.filtered.vcf"
+        """
+    else if( caller == 'MuTect2' )
+        """
+        # report if
+        # T frequency is more than 3%
+        # N frequency is less than 5%
+        # at least 5 variant call supporting reads
+        # T frequency is sufficiently higher than N frequency # "we recommend applying post-processing filters, e.g. by hard-filtering calls with low minor allele frequencies"
+        # only 'PASS' entries
+        gatk.sh -T SelectVariants \
+                -R "${ref_fasta}" \
+                -V "${sample_vcf}" \
+                -select "(vc.getGenotype('TUMOR').getAD().1 / (vc.getGenotype('TUMOR').getAD().0 + vc.getGenotype('TUMOR').getAD().1) )  > 0.03" \
+                -select "(vc.getGenotype('NORMAL').getAD().1 / (vc.getGenotype('NORMAL').getAD().0 + vc.getGenotype('NORMAL').getAD().1) )  > 0.05" \
+                -select "vc.getGenotype('TUMOR').getAD().1 > 5" \
+                -select "(vc.getGenotype('TUMOR').getAD().1 / (vc.getGenotype('TUMOR').getAD().0 + vc.getGenotype('TUMOR').getAD().1) ) > (vc.getGenotype('NORMAL').getAD().1 / (vc.getGenotype('NORMAL').getAD().0 + vc.getGenotype('NORMAL').getAD().1) ) * 5" \
+                -select 'vc.isNotFiltered()' \
                 > "${sampleID}.filtered.vcf"
         """
     else
@@ -188,6 +206,15 @@ process vcf_2_tsv {
         -F CHROM -F POS -F ID -F REF -F ALT -F QUAL -F FILTER -F DP -F AF -F SB -F INDEL -F CONSVAR -F HRUN \
         -o "${sampleID}.tsv"
         """
+    else if( caller == 'MuTect2' )
+        """
+        gatk.sh -T VariantsToTable \
+        -R "${ref_fasta}" \
+        -V "${sample_vcf}" \
+        -F CHROM -F POS -F ID -F REF -F ALT -F FILTER -F QUAL -F AC -F AN -F NLOD -F TLOD \
+        -GF AD -GF DP -GF AF \
+        -o "${sampleID}.tsv"
+        """
     else
         error "Invalid caller: ${caller}"
 }
@@ -211,6 +238,10 @@ process recalc_tsv {
         """
         recalc-vcf-AF.py -c LoFreq -s "${sampleID}" -i "${sample_tsv}" -o "${sampleID}.recalc.tsv"
         """
+    else if( caller == 'MuTect2' )
+        """
+        recalc-vcf-AF.py -c MuTect2 -s "${sampleID}" -i "${sample_tsv}" -o "${sampleID}.recalc.tsv"
+        """
     else
         error "Invalid caller: ${caller}"
 }
@@ -226,38 +257,31 @@ process annotate_vcf {
     set val(caller), val(sampleID), file(annovar_output_txt), file(avinput_file) into samples_annotations
     file(annovar_output_vcf)
 
-    when:
-    caller == 'HaplotypeCaller'
-
     script:
     avinput_file = "${sampleID}.avinput"
     annovar_output_txt = "${sampleID}.${params.ANNOVAR_BUILD_VERSION}_multianno.txt"
     annovar_output_vcf = "${sampleID}.${params.ANNOVAR_BUILD_VERSION}_multianno.vcf"
-    if( caller == 'HaplotypeCaller' )
-        """
-        # convert to ANNOVAR format
-        # convert2annovar.pl --format vcf4old --includeinfo --comment "${sample_vcf}" --outfile "${avinput_file}"
-        # check number of lines between the files
-        # [ ! "\$( cat "${avinput_file}" | wc -l )" -eq "\$(grep -v '^#' "${sample_vcf}" | wc -l)" ] && echo "ERROR: number of entries does not match between files ${sample_vcf} and ${avinput_file}" && exit 1 || :
+    """
+    # convert to ANNOVAR format
+    # convert2annovar.pl --format vcf4old --includeinfo --comment "${sample_vcf}" --outfile "${avinput_file}"
+    # check number of lines between the files
+    # [ ! "\$( cat "${avinput_file}" | wc -l )" -eq "\$(grep -v '^#' "${sample_vcf}" | wc -l)" ] && echo "ERROR: number of entries does not match between files ${sample_vcf} and ${avinput_file}" && exit 1 || :
 
-        # annovate
-        table_annovar.pl "${sample_vcf}" "${annovar_db_dir}" \
-        --buildver "${params.ANNOVAR_BUILD_VERSION}" \
-        --remove \
-        --protocol "${params.ANNOVAR_PROTOCOL}" \
-        --operation "${params.ANNOVAR_OPERATION}" \
-        --nastring . \
-        --vcfinput \
-        --otherinfo \
-        --onetranscript \
-        --outfile "${sampleID}"
-        """
-    else
-        error "Invalid caller: ${caller}"
+    # annovate
+    table_annovar.pl "${sample_vcf}" "${annovar_db_dir}" \
+    --buildver "${params.ANNOVAR_BUILD_VERSION}" \
+    --remove \
+    --protocol "${params.ANNOVAR_PROTOCOL}" \
+    --operation "${params.ANNOVAR_OPERATION}" \
+    --nastring . \
+    --vcfinput \
+    --otherinfo \
+    --onetranscript \
+    --outfile "${sampleID}"
+    """
 }
 
 samples_annotations.join(samples_recalc_tsvs, by: [0,1]).tap { samples_annotations_tables }
-
 process merge_annotation_tables {
     tag "${caller}-${sampleID}"
     publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
@@ -267,6 +291,9 @@ process merge_annotation_tables {
 
     output:
     file(output_file)
+
+    when:
+    caller == 'HaplotypeCaller'
 
     script:
     output_file = "${sampleID}.annotation.tsv"
