@@ -15,24 +15,24 @@ Channel.from( [
 
 Channel.from([
     // caller, tumorID, normalID, chrom, file
-[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr8", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr8.vcf.gz") ],
-[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr2", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr2.vcf.gz") ],
-[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr5", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr5.vcf.gz") ],
-[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr12", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr12.vcf.gz") ],
-[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr3", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr3.vcf.gz") ],
-[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr10", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr10.vcf.gz") ],
-[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr20", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr20.vcf.gz") ],
-[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr14", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr14.vcf.gz") ],
-[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chrX", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chrX.vcf.gz") ],
-[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr13", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr13.vcf.gz") ],
-[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr19", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr19.vcf.gz") ],
-[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr22", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr22.vcf.gz") ],
-[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr21", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr21.vcf.gz") ],
-[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr15", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr15.vcf.gz") ],
-[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr9", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr9.vcf.gz") ],
-[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr4", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr4.vcf.gz") ],
-[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr7", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr7.vcf.gz") ],
-[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr16", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr16.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr8", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr8.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr2", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr2.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr5", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr5.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr12", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr12.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr3", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr3.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr10", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr10.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr20", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr20.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr14", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr14.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chrX", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chrX.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr13", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr13.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr19", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr19.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr22", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr22.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr21", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr21.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr15", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr15.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr9", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr9.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr4", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr4.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr7", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr7.vcf.gz") ],
+// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr16", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr16.vcf.gz") ],
 [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr17", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr17.vcf.gz") ],
 [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr18", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr18.vcf.gz") ],
 [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr11", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr11.vcf.gz") ],
@@ -233,14 +233,14 @@ process recalc_tsv {
         reformat-vcf-table.py -c GATKHC \
         -s "${sampleID}" \
         -i "${sample_tsv}" \
-        -o "${sampleID}.recalc.tmp"
+        -o "${sampleID}.recalc.tsv"
 
         # add a column with the sample ID
-        paste_col.py -i "${sampleID}.recalc.tmp" \
-        -o "${sampleID}.recalc.tsv" \
-        --header "SAMPLE" \
-        -v "${sampleID}" \
-        -d "\t"
+        # paste_col.py -i "${sampleID}.recalc.tmp" \
+        # -o "${sampleID}.recalc.tsv" \
+        # --header "SAMPLE" \
+        # -v "${sampleID}" \
+        # -d "\t"
 
         """
     else if( caller == 'LoFreq' )
@@ -248,28 +248,28 @@ process recalc_tsv {
         reformat-vcf-table.py -c LoFreq \
         -s "${sampleID}" \
         -i "${sample_tsv}" \
-        -o "${sampleID}.recalc.tmp"
+        -o "${sampleID}.recalc.tsv"
 
         # add a column with the sample ID
-        paste_col.py -i "${sampleID}.recalc.tmp" \
-        -o "${sampleID}.recalc.tsv" \
-        --header "SAMPLE" \
-        -v "${sampleID}" \
-        -d "\t"
+        # paste_col.py -i "${sampleID}.recalc.tmp" \
+        # -o "${sampleID}.recalc.tsv" \
+        # --header "SAMPLE" \
+        # -v "${sampleID}" \
+        # -d "\t"
         """
     else if( caller == 'MuTect2' )
         """
         reformat-vcf-table.py -c MuTect2 \
         -s "${sampleID}" \
         -i "${sample_tsv}" \
-        -o "${sampleID}.recalc.tmp"
+        -o "${sampleID}.recalc.tsv"
 
         # add a column with the sample ID
-        paste_col.py -i "${sampleID}.recalc.tmp" \
-        -o "${sampleID}.recalc.tsv" \
-        --header "SAMPLE" \
-        -v "${sampleID}" \
-        -d "\t"
+        # paste_col.py -i "${sampleID}.recalc.tmp" \
+        # -o "${sampleID}.recalc.tsv" \
+        # --header "SAMPLE" \
+        # -v "${sampleID}" \
+        # -d "\t"
 
         """
     else
