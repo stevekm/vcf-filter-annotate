@@ -126,9 +126,6 @@ process filter_vcf {
             -select "vc.getGenotype('${sampleID}').getAD().1 > 5" \
             -select "vc.getGenotype('${sampleID}').getDP() > 0" \
             > "${sampleID}.filtered.vcf"
-
-            # alternate allele freq (allele depth / depth) greater than 0.5
-            # -select "vc.getGenotype('${sampleID}').getAD().1 / vc.getGenotype('${sampleID}').getDP() > 0.50" \
         """
     else if( caller == 'LoFreq' )
         """
@@ -219,14 +216,14 @@ process reformat_tsv {
         reformat-vcf-table.py -c GATKHC \
         -s "${sampleID}" \
         -i "${sample_tsv}" \
-        -o "${sampleID}.reformat.tsv"
+        -o "${sampleID}.reformat.tmp"
 
         # add a column with the sample ID
-        # paste_col.py -i "${sampleID}.recalc.tmp" \
-        # -o "${sampleID}.reformat.tsv" \
-        # --header "SAMPLE" \
-        # -v "${sampleID}" \
-        # -d "\t"
+        paste_col.py -i "${sampleID}.reformat.tmp" \
+        -o "${sampleID}.reformat.tsv" \
+        --header "SAMPLE" \
+        -v "${sampleID}" \
+        -d "\t"
 
         """
     else if( caller == 'LoFreq' )
@@ -234,29 +231,28 @@ process reformat_tsv {
         reformat-vcf-table.py -c LoFreq \
         -s "${sampleID}" \
         -i "${sample_tsv}" \
-        -o "${sampleID}.reformat.tsv"
+        -o "${sampleID}.reformat.tmp"
 
         # add a column with the sample ID
-        # paste_col.py -i "${sampleID}.recalc.tmp" \
-        # -o "${sampleID}.reformat.tsv" \
-        # --header "SAMPLE" \
-        # -v "${sampleID}" \
-        # -d "\t"
+        paste_col.py -i "${sampleID}.reformat.tmp" \
+        -o "${sampleID}.reformat.tsv" \
+        --header "SAMPLE" \
+        -v "${sampleID}" \
+        -d "\t"
         """
     else if( caller == 'MuTect2' )
         """
         reformat-vcf-table.py -c MuTect2 \
         -s "${sampleID}" \
         -i "${sample_tsv}" \
-        -o "${sampleID}.reformat.tsv"
+        -o "${sampleID}.reformat.tmp"
 
         # add a column with the sample ID
-        # paste_col.py -i "${sampleID}.recalc.tmp" \
-        # -o "${sampleID}.reformat.tsv" \
-        # --header "SAMPLE" \
-        # -v "${sampleID}" \
-        # -d "\t"
-
+        paste_col.py -i "${sampleID}.reformat.tmp" \
+        -o "${sampleID}.reformat.tsv" \
+        --header "SAMPLE" \
+        -v "${sampleID}" \
+        -d "\t"
         """
     else
         error "Invalid caller: ${caller}"
