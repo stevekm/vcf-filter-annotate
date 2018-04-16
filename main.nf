@@ -15,24 +15,24 @@ Channel.from( [
 
 Channel.from([
     // caller, tumorID, normalID, chrom, file
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr8", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr8.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr2", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr2.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr5", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr5.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr12", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr12.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr3", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr3.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr10", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr10.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr20", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr20.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr14", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr14.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chrX", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chrX.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr13", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr13.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr19", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr19.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr22", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr22.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr21", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr21.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr15", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr15.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr9", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr9.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr4", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr4.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr7", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr7.vcf.gz") ],
-// [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr16", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr16.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr8", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr8.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr2", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr2.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr5", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr5.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr12", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr12.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr3", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr3.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr10", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr10.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr20", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr20.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr14", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr14.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chrX", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chrX.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr13", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr13.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr19", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr19.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr22", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr22.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr21", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr21.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr15", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr15.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr9", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr9.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr4", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr4.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr7", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr7.vcf.gz") ],
+[ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr16", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr16.vcf.gz") ],
 [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr17", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr17.vcf.gz") ],
 [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr18", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr18.vcf.gz") ],
 [ "MuTect2", "SeraCare-1to1", "HapMap-B17-1267", "chr11", file("input/vcf_mutect2/SeraCare-1to1-Positive_HapMap-B17-1267.chr11.vcf.gz") ],
@@ -59,9 +59,9 @@ Channel.fromPath("${params.ANNOVAR_DB_DIR}").set { annovar_db_dir }
 // # 1. left normalize indels & split multiallelic entries (.vcf -> norm.vcf)
 // # 2. filtere vcf (norm.vcf -> .norm.filtered.vcf)
 // # 2. convert to tsv (.norm.filtered.vcf -> .tsv)
-// # 3. recalculate allele frequency (.tsv -> recalc.tsv)
+// # 3. recalculate allele frequency (.tsv -> reformat.tsv)
 // # 4. annotate (norm.vcf -> .avinput, .hg19_multianno.txt)
-// # 5. merge annotations with .tsv (.hg19_multianno.txt, recalc.tsv -> ... )
+// # 5. merge annotations with .tsv (.hg19_multianno.txt, reformat.tsv -> ... )
 
 process unzip_samples {
     tag "${caller}-${sampleID}"
@@ -99,20 +99,6 @@ process normalize_vcf {
     "${sampleID}.norm.vcf"
     """
 }
-
-process check_normalization {
-    tag "${caller}-${sampleID}"
-    echo true
-
-    input:
-    set val(caller), val(sampleID), file(sample_vcf) from normalized_variants
-
-    script:
-    """
-    echo "[check_normalization] ['${caller}-${sampleID}'] \$(grep '6676635' '${sample_vcf}')"
-    """
-}
-
 
 process filter_vcf {
     tag "${caller}-${sampleID}"
@@ -216,7 +202,7 @@ process vcf_2_tsv {
         error "Invalid caller: ${caller}"
 }
 
-process recalc_tsv {
+process reformat_tsv {
     tag "${caller}-${sampleID}"
     publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
 
@@ -224,7 +210,7 @@ process recalc_tsv {
     set val(caller), val(sampleID), file(sample_tsv) from vcf_tsvs
 
     output:
-    set val(caller), val(sampleID), file("${sampleID}.recalc.tsv") into samples_recalc_tsvs
+    set val(caller), val(sampleID), file("${sampleID}.reformat.tsv") into samples_recalc_tsvs
 
     script:
     if( caller == 'HaplotypeCaller' )
@@ -233,11 +219,11 @@ process recalc_tsv {
         reformat-vcf-table.py -c GATKHC \
         -s "${sampleID}" \
         -i "${sample_tsv}" \
-        -o "${sampleID}.recalc.tsv"
+        -o "${sampleID}.reformat.tsv"
 
         # add a column with the sample ID
         # paste_col.py -i "${sampleID}.recalc.tmp" \
-        # -o "${sampleID}.recalc.tsv" \
+        # -o "${sampleID}.reformat.tsv" \
         # --header "SAMPLE" \
         # -v "${sampleID}" \
         # -d "\t"
@@ -248,11 +234,11 @@ process recalc_tsv {
         reformat-vcf-table.py -c LoFreq \
         -s "${sampleID}" \
         -i "${sample_tsv}" \
-        -o "${sampleID}.recalc.tsv"
+        -o "${sampleID}.reformat.tsv"
 
         # add a column with the sample ID
         # paste_col.py -i "${sampleID}.recalc.tmp" \
-        # -o "${sampleID}.recalc.tsv" \
+        # -o "${sampleID}.reformat.tsv" \
         # --header "SAMPLE" \
         # -v "${sampleID}" \
         # -d "\t"
@@ -262,11 +248,11 @@ process recalc_tsv {
         reformat-vcf-table.py -c MuTect2 \
         -s "${sampleID}" \
         -i "${sample_tsv}" \
-        -o "${sampleID}.recalc.tsv"
+        -o "${sampleID}.reformat.tsv"
 
         # add a column with the sample ID
         # paste_col.py -i "${sampleID}.recalc.tmp" \
-        # -o "${sampleID}.recalc.tsv" \
+        # -o "${sampleID}.reformat.tsv" \
         # --header "SAMPLE" \
         # -v "${sampleID}" \
         # -d "\t"
@@ -323,14 +309,14 @@ process reformat_avinput {
     caller == 'HaplotypeCaller'
 
     output:
-    set val(caller), val(sampleID), file("${sampleID}.avinput.recalc.tsv")
+    set val(caller), val(sampleID), file("${sampleID}.avinput.reformat.tsv")
 
     script:
     if( caller == 'HaplotypeCaller' )
         """
         # keep only the first columns and add headers
-        printf "Chr\tStart\tEnd\tRef\tAlt\tAF\tQUAL\tAD.ALT\tCHROM\tPOS\tID\tREF\tALT\n" > "${sampleID}.avinput.recalc.tsv"
-        cut -f1-13 ${avinput_file} >>  "${sampleID}.avinput.recalc.tsv"
+        printf "Chr\tStart\tEnd\tRef\tAlt\tAF\tQUAL\tAD.ALT\tCHROM\tPOS\tID\tREF\tALT\n" > "${sampleID}.avinput.reformat.tsv"
+        cut -f1-13 ${avinput_file} >>  "${sampleID}.avinput.reformat.tsv"
         """
 }
 
