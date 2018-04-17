@@ -1,4 +1,30 @@
-// ~~~~~  PIPELINE FOR UNPAIRED FILES ~~~~~ //
+// ~~~~~~~~~~ SETUP PARAMETERS ~~~~~~~~~~ //
+params.runID = "170519_NB501073_0010_AHCLLMBGX2"
+params.resultsID = null
+
+// set a timestamp variable if resultsID not passed
+import java.text.SimpleDateFormat
+def resultsID
+if ( params.resultsID == null ) {
+    Date now = new Date()
+    SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
+    resultsID = timestamp.format(now)
+} else {
+    resultsID = params.resultsID
+}
+
+// path to the output directory
+output_dir_path = new File(params.output_dir).getCanonicalPath()
+
+// path to the current directory
+current_dir_path = new File(System.getProperty("user.dir")).getCanonicalPath()
+
+// get the system hostname to identify which system the pipeline is running from
+String localhostname = java.net.InetAddress.getLocalHost().getHostName();
+
+println ">>> ${params.runID} ${resultsID} ${output_dir_path} ${current_dir_path} ${localhostname}"
+
+// ~~~~~~~~~~ INPUT CHANNELS ~~~~~~~~~~ //
 Channel.from( [
             ['HaplotypeCaller', 'NC-HAPMAP', file("input/NC-HAPMAP.GATKHC.vcf.gz")],
             ['LoFreq', 'NC-HAPMAP', file("input/NC-HAPMAP.LoFreq.vcf.gz")],
@@ -56,6 +82,8 @@ Channel.fromPath("${params.ref_dir}/iGenomes/Homo_sapiens/UCSC/hg19/Sequence/Who
         .into { ref_dict; ref_dict2; ref_dict3 }
 Channel.fromPath("${params.ANNOVAR_DB_DIR}").set { annovar_db_dir }
 
+
+// ~~~~~~~~~~ ANALYSIS PIPELINE ~~~~~~~~~~ //
 // # 1. left normalize indels & split multiallelic entries (.vcf -> norm.vcf)
 // # 2. filtere vcf (norm.vcf -> .norm.filtered.vcf)
 // # 2. convert to tsv (.norm.filtered.vcf -> .tsv)
@@ -216,46 +244,80 @@ process reformat_tsv {
         reformat-vcf-table.py -c GATKHC \
         -s "${sampleID}" \
         -i "${sample_tsv}" \
-        -o "${sampleID}.reformat.tmp"
-
-        # add a column with the sample ID
-        paste_col.py -i "${sampleID}.reformat.tmp" \
-        -o "${sampleID}.reformat.tsv" \
-        --header "SAMPLE" \
-        -v "${sampleID}" \
-        -d "\t"
-
+        -o "${sampleID}.reformat.tsv"
         """
     else if( caller == 'LoFreq' )
         """
         reformat-vcf-table.py -c LoFreq \
         -s "${sampleID}" \
         -i "${sample_tsv}" \
-        -o "${sampleID}.reformat.tmp"
-
-        # add a column with the sample ID
-        paste_col.py -i "${sampleID}.reformat.tmp" \
-        -o "${sampleID}.reformat.tsv" \
-        --header "SAMPLE" \
-        -v "${sampleID}" \
-        -d "\t"
+        -o "${sampleID}.reformat.tsv"
         """
     else if( caller == 'MuTect2' )
         """
         reformat-vcf-table.py -c MuTect2 \
         -s "${sampleID}" \
         -i "${sample_tsv}" \
-        -o "${sampleID}.reformat.tmp"
-
-        # add a column with the sample ID
-        paste_col.py -i "${sampleID}.reformat.tmp" \
-        -o "${sampleID}.reformat.tsv" \
-        --header "SAMPLE" \
-        -v "${sampleID}" \
-        -d "\t"
+        -o "${sampleID}.reformat.tsv"
         """
     else
         error "Invalid caller: ${caller}"
+}
+
+process update_tsv_keys {
+    tag "${caller}-${sampleID}"
+    publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
+
+    input:
+    set val(caller), val(sampleID), file(sample_tsv) from samples_recalc_tsvs
+
+    output:
+    set val(caller), val(sampleID), file("${sampleID}.updated.tsv") into samples_updated_tsvs
+
+    script:
+    """
+    # add a column with the sample ID
+    paste_col.py -i "${sample_tsv}" \
+    -o "${sampleID}.updated.tmp1" \
+    --header "Sample" \
+    -v "${sampleID}" \
+    -d "\t"
+
+    # add a column with the run ID
+    paste_col.py -i "${sampleID}.updated.tmp1" \
+    -o "${sampleID}.updated.tmp2" \
+    --header "Run" \
+    -v "${params.runID}" \
+    -d "\t"
+
+    # add a column with the results ID
+    paste_col.py -i "${sampleID}.updated.tmp2" \
+    -o "${sampleID}.updated.tmp3" \
+    --header "Results" \
+    -v "${resultsID}" \
+    -d "\t"
+
+    # add a column with the current dir
+    paste_col.py -i "${sampleID}.updated.tmp3" \
+    -o "${sampleID}.updated.tmp4" \
+    --header "Location" \
+    -v "${current_dir_path}" \
+    -d "\t"
+
+    # add a column with the variant caller
+    paste_col.py -i "${sampleID}.updated.tmp4" \
+    -o "${sampleID}.updated.tmp5" \
+    --header "VariantCaller" \
+    -v "${caller}" \
+    -d "\t"
+
+    # add a column with the system hostname
+    paste_col.py -i "${sampleID}.updated.tmp5" \
+    -o "${sampleID}.updated.tsv" \
+    --header "System" \
+    -v "${localhostname}" \
+    -d "\t"
+    """
 }
 
 process annotate_vcf {
