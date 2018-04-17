@@ -64,12 +64,12 @@ def main(**kwargs):
         fout = sys.stdout
 
     if header:
-        old_header = next(fin).strip(os.linesep)
+        old_header = next(fin).strip()
         new_header = old_header + delim + header + '\n'
-        fout.write(str(new_header))
+        fout.write(new_header)
 
     for line in fin:
-        new_line = str(line.strip(os.linesep) + delim + value + '\n')
+        new_line = line.strip() + delim + value + '\n'
         fout.write(new_line)
 
     fout.close()
