@@ -378,6 +378,21 @@ process reformat_avinput {
         """
 }
 
+process tsv_2_sqlite {
+    tag "${caller}-${sampleID}"
+    publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
+
+    input:
+    set val(caller), val(sampleID), file(sample_tsv) from samples_updated_tsvs
+
+    output:
+    set val(caller), val(sampleID), file("${sampleID}.sqlite") into samples_sqlite
+
+    script:
+    """
+    table2sqlite.py -i "${sample_tsv}" -o "${sampleID}.sqlite" -t variants -d '\t'
+    """
+}
 
 // samples_annotations.join(samples_recalc_tsvs, by: [0,1]).tap { samples_annotations_tables }
 // process merge_annotation_tables {

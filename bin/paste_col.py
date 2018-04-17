@@ -84,7 +84,7 @@ def parse():
     parser.add_argument("-o", default = None, dest = 'output_file', help="Output file")
     parser.add_argument("-d", default = '\t', dest = 'delim', help="Delimiter")
     parser.add_argument("--header", default = None, dest = 'header', help="Header for the new column")
-    parser.add_argument("-v", required=True, dest = 'value', help="Value to write in the new column")
+    parser.add_argument("-v", "--value", required=True, dest = 'value', help="Value to write in the new column")
     args = parser.parse_args()
 
     main(**vars(args))
