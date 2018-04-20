@@ -7,7 +7,7 @@ Pipeline for filtering and annotating variants in .vcf format
 clone this repo
 
 ```
-git clone https://github.com/stevekm/vcf-filter-annotate.git
+git clone --recursive https://github.com/stevekm/vcf-filter-annotate.git
 cd vcf-filter-annotate
 ```
 
@@ -17,7 +17,7 @@ cd vcf-filter-annotate
 
 __NOTE:__ local usage requires Docker to be running
 
-The following command will check for the presence of known system locations for ANNOVAR databases and reference files, and download them if missing. 
+The following command will check for the presence of known system locations for ANNOVAR databases and reference files, and download them if missing.
 
 ```
 make setup
