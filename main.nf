@@ -94,55 +94,60 @@ Channel.fromPath("${params.ANNOVAR_DB_DIR}").set { annovar_db_dir }
 process unzip_samples {
     // unzip the vcf.gz files
     tag "${caller}-${sampleID}"
-    publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/samples/${sampleID}/${caller}", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/analysis/unzip_samples", overwrite: true
 
     input:
     set val(caller), val(sampleID), file(sample_vcf) from sample_variants_zipped.concat(pairs_variants_zipped)
 
     output:
-    set val(caller), val(sampleID), file("${sampleID}.vcf") into sample_variants
+    set val(caller), val(sampleID), file("${prefix}.vcf") into sample_variants
 
     script:
+    prefix = "${sampleID}.${caller}"
     """
-    gunzip -c "${sample_vcf}" > "${sampleID}.vcf"
+    gunzip -c "${sample_vcf}" > "${prefix}.vcf"
     """
 }
 
 process normalize_vcf {
     // normalize and split the VCF entries
     tag "${caller}-${sampleID}"
-    publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/samples/${sampleID}/${caller}", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/analysis/normalize_vcf", overwrite: true
 
     input:
     set val(caller), val(sampleID), file(sample_vcf), file(ref_fasta) from sample_variants.combine(ref_fasta)
 
     output:
-    set val(caller), val(sampleID), file("${sampleID}.norm.vcf") into (normalized_variants, normalized_variants2)
-    file("${sampleID}.bcftools.multiallelics.stats.txt")
-    file("${sampleID}.bcftools.realign.stats.txt")
+    set val(caller), val(sampleID), file("${prefix}.norm.vcf") into (normalized_variants, normalized_variants2)
+    file("${prefix}.bcftools.multiallelics.stats.txt")
+    file("${prefix}.bcftools.realign.stats.txt")
 
     script:
+    prefix = "${sampleID}.${caller}"
     """
     cat ${sample_vcf} | \
-    bcftools norm --multiallelics -both --output-type v - 2>"${sampleID}.bcftools.multiallelics.stats.txt" | \
-    bcftools norm --fasta-ref "${ref_fasta}" --output-type v - 2>"${sampleID}.bcftools.realign.stats.txt" > \
-    "${sampleID}.norm.vcf"
+    bcftools norm --multiallelics -both --output-type v - 2>"${prefix}.bcftools.multiallelics.stats.txt" | \
+    bcftools norm --fasta-ref "${ref_fasta}" --output-type v - 2>"${prefix}.bcftools.realign.stats.txt" > \
+    "${prefix}.norm.vcf"
     """
 }
 
 process filter_vcf {
     // filter the VCF entries
     tag "${caller}-${sampleID}"
-    publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
-    echo true
+    publishDir "${params.output_dir}/samples/${sampleID}/${caller}", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/analysis/filter_vcf", overwrite: true
 
     input:
     set val(caller), val(sampleID), file(sample_vcf), file(ref_fasta), file(ref_fai), file(ref_dict) from normalized_variants2.combine(ref_fasta2).combine(ref_fai2).combine(ref_dict2)
 
     output:
-    set val(caller), val(sampleID), file("${sampleID}.filtered.vcf") into filtered_vcfs
+    set val(caller), val(sampleID), file("${prefix}.filtered.vcf") into filtered_vcfs
 
     script:
+    prefix = "${sampleID}.${caller}"
     if( caller == 'HaplotypeCaller' )
         """
         # report if
@@ -156,7 +161,7 @@ process filter_vcf {
             -select "vc.getGenotype('${sampleID}').getAD().1 / vc.getGenotype('${sampleID}').getDP() > 0.50" \
             -select "vc.getGenotype('${sampleID}').getAD().1 > 5" \
             -select "vc.getGenotype('${sampleID}').getDP() > 0" \
-            > "${sampleID}.filtered.vcf"
+            > "${prefix}.filtered.vcf"
         """
     else if( caller == 'LoFreq' )
         """
@@ -165,7 +170,7 @@ process filter_vcf {
                 -R "${ref_fasta}" \
                 -V "${sample_vcf}" \
                 -select "AF > 0.01"  \
-                > "${sampleID}.filtered.vcf"
+                > "${prefix}.filtered.vcf"
         """
     else if( caller == 'MuTect2' )
         """
@@ -183,7 +188,7 @@ process filter_vcf {
                 -select "vc.getGenotype('TUMOR').getAD().1 > 5" \
                 -select "(vc.getGenotype('TUMOR').getAD().1 / (vc.getGenotype('TUMOR').getAD().0 + vc.getGenotype('TUMOR').getAD().1) ) > (vc.getGenotype('NORMAL').getAD().1 / (vc.getGenotype('NORMAL').getAD().0 + vc.getGenotype('NORMAL').getAD().1) ) * 5" \
                 -select 'vc.isNotFiltered()' \
-                > "${sampleID}.filtered.vcf"
+                > "${prefix}.filtered.vcf"
         """
     else
         error "Invalid caller: ${caller}"
@@ -192,15 +197,17 @@ process filter_vcf {
 process vcf_2_tsv {
     // convert VCF file to TSV
     tag "${caller}-${sampleID}"
-    publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/samples/${sampleID}/${caller}", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/analysis/vcf_2_tsv", overwrite: true
 
     input:
     set val(caller), val(sampleID), file(sample_vcf), file(ref_fasta), file(ref_fai), file(ref_dict) from filtered_vcfs.combine(ref_fasta3).combine(ref_fai3).combine(ref_dict3)
 
     output:
-    set val(caller), val(sampleID), file(sample_vcf), file("${sampleID}.tsv") into vcf_tsvs
+    set val(caller), val(sampleID), file(sample_vcf), file("${prefix}.tsv") into vcf_tsvs
 
     script:
+    prefix = "${sampleID}.${caller}"
     if( caller == 'HaplotypeCaller' )
         """
         gatk.sh -T VariantsToTable \
@@ -208,7 +215,7 @@ process vcf_2_tsv {
         -V "${sample_vcf}" \
         -F CHROM -F POS -F ID -F REF -F ALT -F FILTER -F QUAL -F AC -F AN \
         -GF AD -GF DP \
-        -o "${sampleID}.tsv"
+        -o "${prefix}.tsv"
         """
     else if( caller == 'LoFreq' )
         """
@@ -216,7 +223,7 @@ process vcf_2_tsv {
         -R "${ref_fasta}" \
         -V "${sample_vcf}" \
         -F CHROM -F POS -F ID -F REF -F ALT -F QUAL -F FILTER -F DP -F AF -F SB -F INDEL -F CONSVAR -F HRUN \
-        -o "${sampleID}.tsv"
+        -o "${prefix}.tsv"
         """
     else if( caller == 'MuTect2' )
         """
@@ -225,24 +232,26 @@ process vcf_2_tsv {
         -V "${sample_vcf}" \
         -F CHROM -F POS -F ID -F REF -F ALT -F FILTER -F QUAL -F AC -F AN -F NLOD -F TLOD \
         -GF AD -GF DP -GF AF \
-        -o "${sampleID}.tsv"
+        -o "${prefix}.tsv"
         """
     else
         error "Invalid caller: ${caller}"
 }
-//
+
 process reformat_vcf_tsv {
     // reformat and adjust the TSV table for consistency downstream
     tag "${caller}-${sampleID}"
-    publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/samples/${sampleID}/${caller}", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/analysis/reformat_vcf_tsv", overwrite: true
 
     input:
     set val(caller), val(sampleID), file(sample_vcf), file(sample_tsv) from vcf_tsvs
 
     output:
-    set val(caller), val(sampleID), file(sample_vcf), file("${sampleID}.reformat.tsv") into vcfs_tsvs_reformat
+    set val(caller), val(sampleID), file(sample_vcf), file("${prefix}.reformat.tsv") into vcfs_tsvs_reformat
 
     script:
+    prefix = "${sampleID}.${caller}"
     if( caller == 'HaplotypeCaller' )
         """
         # reformat and adjust the TSV table for consistency downstream
@@ -254,7 +263,7 @@ process reformat_vcf_tsv {
         paste-col.py --header "Location" -v "${current_dir_path}" | \
         paste-col.py --header "VariantCaller" -v "${caller}" | \
         paste-col.py --header "System" -v "${localhostname}" > \
-        "${sampleID}.reformat.tsv"
+        "${prefix}.reformat.tsv"
         """
     else if( caller == 'LoFreq' )
         """
@@ -265,7 +274,7 @@ process reformat_vcf_tsv {
         paste-col.py --header "Location" -v "${current_dir_path}" | \
         paste-col.py --header "VariantCaller" -v "${caller}" | \
         paste-col.py --header "System" -v "${localhostname}" > \
-        "${sampleID}.reformat.tsv"
+        "${prefix}.reformat.tsv"
         """
     else if( caller == 'MuTect2' )
         """
@@ -276,7 +285,7 @@ process reformat_vcf_tsv {
         paste-col.py --header "Location" -v "${current_dir_path}" | \
         paste-col.py --header "VariantCaller" -v "${caller}" | \
         paste-col.py --header "System" -v "${localhostname}" > \
-        "${sampleID}.reformat.tsv"
+        "${prefix}.reformat.tsv"
         """
     else
         error "Invalid caller: ${caller}"
@@ -285,7 +294,8 @@ process reformat_vcf_tsv {
 process annotate_vcf {
     // annotate the VCF file
     tag "${caller}-${sampleID}"
-    publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/samples/${sampleID}/${caller}", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/analysis/annotate_vcf", overwrite: true
     validExitStatus 0,11 // allow '11' failure triggered by few/no variants
     errorStrategy 'ignore'
 
@@ -293,15 +303,13 @@ process annotate_vcf {
     set val(caller), val(sampleID), file(sample_vcf), file(sample_tsv), file(annovar_db_dir) from vcfs_tsvs_reformat.combine(annovar_db_dir)
 
     output:
-    set val(caller), val(sampleID), file(sample_vcf), file(sample_tsv), file(annovar_output_txt), file("${sampleID}.avinput.tsv") into vcfs_tsvs_annotations
-
-    // when:
-    // caller == 'HaplotypeCaller' || caller == 'LoFreq'
+    set val(caller), val(sampleID), file(sample_vcf), file(sample_tsv), file(annovar_output_txt), file("${prefix}.avinput.tsv") into vcfs_tsvs_annotations
 
     script:
-    avinput_file = "${sampleID}.avinput"
-    annovar_output_txt = "${sampleID}.${params.ANNOVAR_BUILD_VERSION}_multianno.txt"
-    annovar_output_vcf = "${sampleID}.${params.ANNOVAR_BUILD_VERSION}_multianno.vcf"
+    prefix = "${sampleID}.${caller}"
+    avinput_file = "${prefix}.avinput"
+    annovar_output_txt = "${prefix}.${params.ANNOVAR_BUILD_VERSION}_multianno.txt"
+    annovar_output_vcf = "${prefix}.${params.ANNOVAR_BUILD_VERSION}_multianno.vcf"
     if( caller == 'HaplotypeCaller' )
         """
         # make sure there are variants present, by checking the .TSV file; should have >1 line
@@ -316,10 +324,10 @@ process annotate_vcf {
         --nastring . \
         --vcfinput \
         --onetranscript \
-        --outfile "${sampleID}"
+        --outfile "${prefix}"
 
-        printf "Chr\tStart\tEnd\tRef\tAlt\tAF\tQuality\tAD.ALT\tCHROM\tPOS\tID\tREF\tALT\tQUAL\n" > "${sampleID}.avinput.tsv"
-        cut -f1-14 ${avinput_file} >>  "${sampleID}.avinput.tsv"
+        printf "Chr\tStart\tEnd\tRef\tAlt\tAF\tQuality\tAD.ALT\tCHROM\tPOS\tID\tREF\tALT\tQUAL\n" > "${prefix}.avinput.tsv"
+        cut -f1-14 ${avinput_file} >>  "${prefix}.avinput.tsv"
         """
     else if( caller == 'LoFreq' )
         """
@@ -334,10 +342,10 @@ process annotate_vcf {
         --nastring . \
         --vcfinput \
         --onetranscript \
-        --outfile "${sampleID}"
+        --outfile "${prefix}"
 
-        printf "Chr\tStart\tEnd\tRef\tAlt\tId\tQuality\tDP\tCHROM\tPOS\tID\tREF\tALT\tQUAL\n" > "${sampleID}.avinput.tsv"
-        cut -f1-14 ${avinput_file} >>  "${sampleID}.avinput.tsv"
+        printf "Chr\tStart\tEnd\tRef\tAlt\tId\tQuality\tDP\tCHROM\tPOS\tID\tREF\tALT\tQUAL\n" > "${prefix}.avinput.tsv"
+        cut -f1-14 ${avinput_file} >>  "${prefix}.avinput.tsv"
         """
     else if( caller == 'MuTect2' )
         """
@@ -352,11 +360,11 @@ process annotate_vcf {
         --nastring . \
         --vcfinput \
         --onetranscript \
-        --outfile "${sampleID}"
+        --outfile "${prefix}"
 
         # TODO: Need to check this! Need a MuTect2 .vcf with passing variants!
-        printf "Chr\tStart\tEnd\tRef\tAlt\tId\tQuality\tDP\tCHROM\tPOS\tID\tREF\tALT\tQUAL\n" > "${sampleID}.avinput.tsv"
-        cut -f1-14 ${avinput_file} >>  "${sampleID}.avinput.tsv"
+        printf "Chr\tStart\tEnd\tRef\tAlt\tId\tQuality\tDP\tCHROM\tPOS\tID\tREF\tALT\tQUAL\n" > "${prefix}.avinput.tsv"
+        cut -f1-14 ${avinput_file} >>  "${prefix}.avinput.tsv"
         """
     else
         error "Invalid caller: ${caller}"
@@ -365,19 +373,21 @@ process annotate_vcf {
 process merge_tables {
     // merge the annotation and vcf tables
     tag "${caller}-${sampleID}"
-    publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/samples/${sampleID}/${caller}", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/analysis/merge_tables", overwrite: true
 
     input:
     set val(caller), val(sampleID), file(sample_vcf), file(sample_tsv), file(annovar_txt), file(avinput_file) from vcfs_tsvs_annotations
 
     output:
-    set val(caller), val(sampleID), file("${sampleID}.annotations.tsv") into merged_tables
-    file("${sampleID}.annotations.tsv") into merged_tables2
+    set val(caller), val(sampleID), file("${prefix}.annotations.tsv") into merged_tables
+    file("${prefix}.annotations.tsv") into merged_tables2
 
     script:
+    prefix = "${sampleID}.${caller}"
     """
-    merge-vcf-tables.R "${sample_tsv}" "${annovar_txt}" "${avinput_file}" "${sampleID}.annotations.tmp"
-    hash-col.py -i "${sampleID}.annotations.tmp" -o "${sampleID}.annotations.tsv" --header 'Hash' -k Chr Start End Ref Alt CHROM POS REF ALT Sample Run Results VariantCaller
+    merge-vcf-tables.R "${sample_tsv}" "${annovar_txt}" "${avinput_file}" "${prefix}.annotations.tmp"
+    hash-col.py -i "${prefix}.annotations.tmp" -o "${prefix}.annotations.tsv" --header 'Hash' -k Chr Start End Ref Alt CHROM POS REF ALT Sample Run Results VariantCaller
     """
 
 }
@@ -386,24 +396,29 @@ process tsv_2_sqlite {
     // convert TSV files into SQLite databases
     // NOTE: case-insensitive columns; 'Ref' and 'REF', one will get dropped...
     tag "${caller}-${sampleID}"
-    publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/samples/${sampleID}/${caller}", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/analysis/tsv_2_sqlite", overwrite: true
 
     input:
     set val(caller), val(sampleID), file(sample_tsv) from merged_tables
 
     output:
-    set val(caller), val(sampleID), file("${sampleID}.sqlite") into samples_sqlite
-    file("${sampleID}.sqlite.csv")
-    file("${sampleID}.sqlite.txt")
+    set val(caller), val(sampleID), file("${sqlite}") into samples_sqlite
+    file("${dump_csv}")
+    file("${dump_sqlite}")
 
     script:
+    prefix = "${sampleID}.${caller}"
+    sqlite = "${prefix}.sqlite"
+    dump_csv = "${prefix}.sqlite.csv"
+    dump_sqlite = "${prefix}.sqlite.txt"
     """
-    table2sqlite.py -i "${sample_tsv}" -o "${sampleID}.sqlite" -t variants --dump-csv "${sampleID}.sqlite.csv" --dump-sqlite "${sampleID}.sqlite.txt"
+    table2sqlite.py -i "${sample_tsv}" -o "${sqlite}" -t variants --dump-csv "${dump_csv}" --dump-sqlite "${dump_sqlite}"
     """
 }
 
 process collect_annotation_tables {
-    publishDir "${params.output_dir}", mode: 'copy', overwrite: true
+    publishDir "${params.output_dir}/analysis/collect_annotation_tables", mode: 'copy', overwrite: true
 
     input:
     file('table*') from merged_tables2.collect()

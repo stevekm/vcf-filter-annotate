@@ -1,10 +1,12 @@
 SHELL:=/bin/bash
 REFDIR:=/ifs/data/sequence/results/external/NYU/snuderllab/ref
 ANNOVAR_DB_DIR:=/ifs/data/molecpathlab/bin/annovar/db/hg19
+NXF_VER:=0.29.0
 .PHONY: annovar_db ref
 
 # ~~~~~ SETUP PIPELINE ~~~~~ #
 ./nextflow:
+	export NXF_VER="$(NXF_VER)" && \
 	curl -fsSL get.nextflow.io | bash
 
 install: ./nextflow
