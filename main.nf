@@ -354,6 +354,7 @@ process annotate_vcf {
         --onetranscript \
         --outfile "${sampleID}"
 
+        # TODO: Need to check this! Need a MuTect2 .vcf with passing variants!
         printf "Chr\tStart\tEnd\tRef\tAlt\tId\tQuality\tDP\tCHROM\tPOS\tID\tREF\tALT\tQUAL\n" > "${sampleID}.avinput.tsv"
         cut -f1-14 ${avinput_file} >>  "${sampleID}.avinput.tsv"
         """
@@ -371,6 +372,7 @@ process merge_tables {
 
     output:
     set val(caller), val(sampleID), file("${sampleID}.annotations.tsv") into merged_tables
+    file("${sampleID}.annotations.tsv") into merged_tables2
 
     script:
     """
@@ -397,5 +399,20 @@ process tsv_2_sqlite {
     script:
     """
     table2sqlite.py -i "${sample_tsv}" -o "${sampleID}.sqlite" -t variants --dump-csv "${sampleID}.sqlite.csv" --dump-sqlite "${sampleID}.sqlite.txt"
+    """
+}
+
+process collect_annotation_tables {
+    publishDir "${params.output_dir}", mode: 'copy', overwrite: true
+
+    input:
+    file('table*') from merged_tables2.collect()
+
+    output:
+    file('all_annotations.tsv')
+
+    script:
+    """
+    concat-tables.py * > all_annotations.tsv
     """
 }
