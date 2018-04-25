@@ -27,7 +27,7 @@ def main(**kwargs):
     input_file = kwargs.pop('input_file')
     output_file = kwargs.pop('output_file')
     table_name = kwargs.pop('table_name')
-    delimiter = kwargs.pop('delimiter', ',')
+    delimiter = kwargs.pop('delimiter', '\t')
 
     conn = sqlite3.connect(output_file)
     sqt.csv2sqlite(conn = conn, input_file = input_file, table_name = table_name, delimiter = delimiter)
@@ -40,7 +40,7 @@ def parse():
     parser.add_argument("-i", required = True, dest = 'input_file', help="Input file")
     parser.add_argument("-o", required = True, dest = 'output_file', help="Output file")
     parser.add_argument("-t", "--table-name", required = True, dest = 'table_name', help="Name for the SQLite table in the database")
-    parser.add_argument("-d", "--delimiter", default = ',', dest = 'delimiter', help="Delimiter")
+    parser.add_argument("-d", "--delimiter", default = '\t', dest = 'delimiter', help="Delimiter")
     args = parser.parse_args()
 
     main(**vars(args))

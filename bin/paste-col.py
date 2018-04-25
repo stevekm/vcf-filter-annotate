@@ -13,24 +13,24 @@ $ cat text.txt
 a	b	c
 d	e	f
 
-$ cat text.txt | ./paste_col.py -v foo
+$ cat text.txt | ./paste-col.py -v foo
 a	b	c	foo
 d	e	f	foo
 
-$ cat text.txt | ./paste_col.py -v foo --header bar
+$ cat text.txt | ./paste-col.py -v foo --header bar
 a	b	c	bar
 d	e	f	foo
 
-$ ./paste_col.py -i text.txt -o text2.txt -v baz -d ,
+$ ./paste-col.py -i text.txt -o text2.txt -v baz -d ,
 
 $ cat text2.txt
 a	b	c,baz
 d	e	f,baz
 
-$ cat text.txt | ./paste_col.py -v buz | head -1
+$ cat text.txt | ./paste-col.py -v buz | head -1
 a	b	c	buz
 
-$ cat sample.hg19_multianno.txt | ./paste_col.py --header Sample -v foo2 | head
+$ cat sample.hg19_multianno.txt | ./paste-col.py --header Sample -v foo2 | head
 
 """
 import os

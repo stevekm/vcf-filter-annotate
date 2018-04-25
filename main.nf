@@ -92,6 +92,7 @@ Channel.fromPath("${params.ANNOVAR_DB_DIR}").set { annovar_db_dir }
 // # 5. merge annotations with .tsv (.hg19_multianno.txt, reformat.tsv -> ... )
 
 process unzip_samples {
+    // unzip the vcf.gz files
     tag "${caller}-${sampleID}"
     publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
 
@@ -108,6 +109,7 @@ process unzip_samples {
 }
 
 process normalize_vcf {
+    // normalize and split the VCF entries
     tag "${caller}-${sampleID}"
     publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
 
@@ -129,6 +131,7 @@ process normalize_vcf {
 }
 
 process filter_vcf {
+    // filter the VCF entries
     tag "${caller}-${sampleID}"
     publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
     echo true
@@ -187,6 +190,7 @@ process filter_vcf {
 }
 
 process vcf_2_tsv {
+    // convert VCF file to TSV
     tag "${caller}-${sampleID}"
     publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
 
@@ -227,7 +231,8 @@ process vcf_2_tsv {
         error "Invalid caller: ${caller}"
 }
 
-process reformat_tsv {
+process reformat_vcf_tsv {
+    // reformat and adjust the TSV table for consistency downstream
     tag "${caller}-${sampleID}"
     publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
 
@@ -240,7 +245,6 @@ process reformat_tsv {
     script:
     if( caller == 'HaplotypeCaller' )
         """
-        # reformat and adjust the TSV table
         reformat-vcf-table.py -c GATKHC \
         -s "${sampleID}" \
         -i "${sample_tsv}" \
@@ -265,6 +269,7 @@ process reformat_tsv {
 }
 
 process update_tsv_keys {
+    // add extra columns to the VCF TSV file for downstream
     tag "${caller}-${sampleID}"
     publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
 
@@ -277,50 +282,57 @@ process update_tsv_keys {
     script:
     """
     # add a column with the sample ID
-    paste_col.py -i "${sample_tsv}" \
+    paste-col.py -i "${sample_tsv}" \
     -o "${sampleID}.updated.tmp1" \
     --header "Sample" \
     -v "${sampleID}" \
     -d "\t"
 
     # add a column with the run ID
-    paste_col.py -i "${sampleID}.updated.tmp1" \
+    paste-col.py -i "${sampleID}.updated.tmp1" \
     -o "${sampleID}.updated.tmp2" \
     --header "Run" \
     -v "${params.runID}" \
     -d "\t"
 
     # add a column with the results ID
-    paste_col.py -i "${sampleID}.updated.tmp2" \
+    paste-col.py -i "${sampleID}.updated.tmp2" \
     -o "${sampleID}.updated.tmp3" \
     --header "Results" \
     -v "${resultsID}" \
     -d "\t"
 
     # add a column with the current dir
-    paste_col.py -i "${sampleID}.updated.tmp3" \
+    paste-col.py -i "${sampleID}.updated.tmp3" \
     -o "${sampleID}.updated.tmp4" \
     --header "Location" \
     -v "${current_dir_path}" \
     -d "\t"
 
     # add a column with the variant caller
-    paste_col.py -i "${sampleID}.updated.tmp4" \
+    paste-col.py -i "${sampleID}.updated.tmp4" \
     -o "${sampleID}.updated.tmp5" \
     --header "VariantCaller" \
     -v "${caller}" \
     -d "\t"
 
     # add a column with the system hostname
-    paste_col.py -i "${sampleID}.updated.tmp5" \
-    -o "${sampleID}.updated.tsv" \
+    paste-col.py -i "${sampleID}.updated.tmp5" \
+    -o "${sampleID}.updated.tmp6" \
     --header "System" \
     -v "${localhostname}" \
     -d "\t"
+
+    # add md5sum has for desired columns
+    hash-col.py -i "${sampleID}.updated.tmp6" \
+    -o "${sampleID}.updated.tsv" \
+    --header 'Hash' \
+    -k CHROM POS REF ALT Sample Run Results VariantCaller
     """
 }
 
 process annotate_vcf {
+    // annotate the VCF file
     tag "${caller}-${sampleID}"
     publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
 
@@ -357,6 +369,7 @@ process annotate_vcf {
 }
 
 process reformat_avinput {
+    // add column headers for the .avinput file and subset it for just the desired columns
     tag "${caller}-${sampleID}"
     publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
 
@@ -379,6 +392,7 @@ process reformat_avinput {
 }
 
 process tsv_2_sqlite {
+    // convert TSV files into SQLite databases
     tag "${caller}-${sampleID}"
     publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
 
@@ -390,7 +404,7 @@ process tsv_2_sqlite {
 
     script:
     """
-    table2sqlite.py -i "${sample_tsv}" -o "${sampleID}.sqlite" -t variants -d '\t'
+    table2sqlite.py -i "${sample_tsv}" -o "${sampleID}.sqlite" -t variants 
     """
 }
 
