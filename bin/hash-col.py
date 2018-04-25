@@ -3,6 +3,16 @@
 """
 Appends a column to a file with the hash of the selected columns in the file
 
+Notes
+-----
+If ``header`` is not provided, contents of the line are hashed as-is, and the hash value is appened to the end of the line with the provided delimiter.
+
+If a ``header`` is provided, then the line will be converted to a dictionary before being hashed, with fields split based on the provided delimiter. The hash will be appended to a new column on each line.
+
+If ``header`` is provided without keys, then all values in the line are hashed in the order they appear in the file.
+
+If ``header`` is provided with keys, then only the selected keys will be hashed, in the order specified on the command line.
+
 Examples
 --------
 Examples usage::
@@ -18,6 +28,7 @@ import hashlib
 import csv
 import sys
 import argparse
+from collections import OrderedDict
 
 from signal import signal, SIGPIPE, SIG_DFL
 signal(SIGPIPE,SIG_DFL)
@@ -84,18 +95,18 @@ def hash_table(fin, fout, hash_keyname, keys_to_hash, delimiter):
     writer = csv.DictWriter(fout, delimiter = delimiter, fieldnames = output_fieldnames)
     writer.writeheader()
     for row in reader:
-        row = hash_dict(d = row, keys_to_hash = keys_to_hash, hash_keyname = hash_keyname)
-        writer.writerow(row)
+        # preserve the initial ordering of columns in the input file
+        sorted_row = OrderedDict(sorted(row.items(), key=lambda item: reader.fieldnames.index(item[0])))
+        sorted_row = hash_dict(d = sorted_row, keys_to_hash = keys_to_hash, hash_keyname = hash_keyname)
+        writer.writerow(sorted_row)
 
 def hash_lines(fin, fout, delimiter):
     """
     Hashes the contents of a file without headers
     """
     for line in fin:
-        parts = line.strip().split(delimiter)
-        hash_str = ''.join(parts)
-        hash_hash = md5_str(hash_str)
-        fout.write(line + hash_hash + '\n')
+        hash_hash = md5_str(line.strip())
+        fout.write(line.strip() + delimiter + hash_hash + '\n')
 
 def main(**kwargs):
     """

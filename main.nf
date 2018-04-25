@@ -281,53 +281,13 @@ process update_tsv_keys {
 
     script:
     """
-    # add a column with the sample ID
-    paste-col.py -i "${sample_tsv}" \
-    -o "${sampleID}.updated.tmp1" \
-    --header "Sample" \
-    -v "${sampleID}" \
-    -d "\t"
-
-    # add a column with the run ID
-    paste-col.py -i "${sampleID}.updated.tmp1" \
-    -o "${sampleID}.updated.tmp2" \
-    --header "Run" \
-    -v "${params.runID}" \
-    -d "\t"
-
-    # add a column with the results ID
-    paste-col.py -i "${sampleID}.updated.tmp2" \
-    -o "${sampleID}.updated.tmp3" \
-    --header "Results" \
-    -v "${resultsID}" \
-    -d "\t"
-
-    # add a column with the current dir
-    paste-col.py -i "${sampleID}.updated.tmp3" \
-    -o "${sampleID}.updated.tmp4" \
-    --header "Location" \
-    -v "${current_dir_path}" \
-    -d "\t"
-
-    # add a column with the variant caller
-    paste-col.py -i "${sampleID}.updated.tmp4" \
-    -o "${sampleID}.updated.tmp5" \
-    --header "VariantCaller" \
-    -v "${caller}" \
-    -d "\t"
-
-    # add a column with the system hostname
-    paste-col.py -i "${sampleID}.updated.tmp5" \
-    -o "${sampleID}.updated.tmp6" \
-    --header "System" \
-    -v "${localhostname}" \
-    -d "\t"
-
-    # add md5sum has for desired columns
-    hash-col.py -i "${sampleID}.updated.tmp6" \
-    -o "${sampleID}.updated.tsv" \
-    --header 'Hash' \
-    -k CHROM POS REF ALT Sample Run Results VariantCaller
+    paste-col.py -i "${sample_tsv}" --header "Sample" -v "${sampleID}"  | \
+    paste-col.py --header "Run" -v "${params.runID}" | \
+    paste-col.py --header "Results" -v "${resultsID}" | \
+    paste-col.py --header "Location" -v "${current_dir_path}" | \
+    paste-col.py --header "VariantCaller" -v "${caller}" | \
+    paste-col.py --header "System" -v "${localhostname}" | \
+    hash-col.py -o "${sampleID}.updated.tsv" --header 'Hash' -k CHROM POS REF ALT Sample Run Results VariantCaller
     """
 }
 
@@ -369,7 +329,7 @@ process annotate_vcf {
 }
 
 process reformat_avinput {
-    // add column headers for the .avinput file and subset it for just the desired columns
+    // add column headers for the .avinput file and subset it for just the desired columns, add hash values
     tag "${caller}-${sampleID}"
     publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
 
@@ -381,13 +341,22 @@ process reformat_avinput {
 
     output:
     set val(caller), val(sampleID), file("${sampleID}.avinput.reformat.tsv")
+    file("${sampleID}.avinput.reformat.tmp")
 
     script:
     if( caller == 'HaplotypeCaller' )
         """
-        # keep only the first columns and add headers
-        printf "Chr\tStart\tEnd\tRef\tAlt\tAF\tQUAL\tAD.ALT\tCHROM\tPOS\tID\tREF\tALT\n" > "${sampleID}.avinput.reformat.tsv"
-        cut -f1-13 ${avinput_file} >>  "${sampleID}.avinput.reformat.tsv"
+        printf "Chr\tStart\tEnd\tRef\tAlt\tAF\tQUAL\tAD.ALT\tCHROM\tPOS\tID\tREF\tALT\n" > "${sampleID}.avinput.reformat.tmp"
+        cut -f1-13 ${avinput_file} >>  "${sampleID}.avinput.reformat.tmp"
+
+        paste-col.py -i "${sampleID}.avinput.reformat.tmp" --header "Sample" -v "${sampleID}"  | \
+        paste-col.py --header "Run" -v "${params.runID}" | \
+        paste-col.py --header "Results" -v "${resultsID}" | \
+        paste-col.py --header "Location" -v "${current_dir_path}" | \
+        paste-col.py --header "VariantCaller" -v "${caller}" | \
+        paste-col.py --header "System" -v "${localhostname}" | \
+        hash-col.py --header 'vcf.Hash' -k CHROM POS REF ALT Sample Run Results VariantCaller | \
+        hash-col.py -o "${sampleID}.avinput.reformat.tsv" --header 'annotation.Hash' -k Chr Start End Ref Alt Sample Run Results VariantCaller
         """
 }
 
@@ -404,7 +373,7 @@ process tsv_2_sqlite {
 
     script:
     """
-    table2sqlite.py -i "${sample_tsv}" -o "${sampleID}.sqlite" -t variants 
+    table2sqlite.py -i "${sample_tsv}" -o "${sampleID}.sqlite" -t variants
     """
 }
 
