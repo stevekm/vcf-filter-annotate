@@ -6,3 +6,4 @@ trace.txt
 flowchart.dot
 annovar_db/*
 .nextflow*
+.Rapp.history

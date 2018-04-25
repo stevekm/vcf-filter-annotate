@@ -28,9 +28,16 @@ def main(**kwargs):
     output_file = kwargs.pop('output_file')
     table_name = kwargs.pop('table_name')
     delimiter = kwargs.pop('delimiter', '\t')
+    dump_csv = kwargs.pop('dump_csv', None)
+    dump_sqlite = kwargs.pop('dump_sqlite', None)
 
     conn = sqlite3.connect(output_file)
     sqt.csv2sqlite(conn = conn, input_file = input_file, table_name = table_name, delimiter = delimiter)
+
+    if dump_csv:
+        sqt.dump_csv(conn = conn, table_name = table_name, output_file = dump_csv)
+    if dump_sqlite:
+        sqt.dump_sqlite(conn = conn, output_file = dump_sqlite)
 
 def parse():
     """
@@ -41,6 +48,8 @@ def parse():
     parser.add_argument("-o", required = True, dest = 'output_file', help="Output file")
     parser.add_argument("-t", "--table-name", required = True, dest = 'table_name', help="Name for the SQLite table in the database")
     parser.add_argument("-d", "--delimiter", default = '\t', dest = 'delimiter', help="Delimiter")
+    parser.add_argument("--dump-csv", default = None, dest = 'dump_csv', help="File to dump .csv formatted output to")
+    parser.add_argument("--dump-sqlite", default = None, dest = 'dump_sqlite', help="File to dump SQLite database contents to")
     args = parser.parse_args()
 
     main(**vars(args))
