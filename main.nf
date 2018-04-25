@@ -29,13 +29,13 @@ Channel.from( [
             ['HaplotypeCaller', 'NC-HAPMAP', file("input/NC-HAPMAP.GATKHC.vcf.gz")],
             ['LoFreq', 'NC-HAPMAP', file("input/NC-HAPMAP.LoFreq.vcf.gz")],
             ['HaplotypeCaller', 'SC-SERACARE', file("input/SC-SERACARE.GATKHC.vcf.gz")],
-            ['LoFreq', 'SC-SERACARE', file("input/SC-SERACARE.LoFreq.vcf.gz")]
-            // [ "LoFreq", "NTC-H2O", file("input/vcf_lofreq/NTC-H2O.vcf.gz") ],
-            // [ "LoFreq", "HapMap-B17-1267", file("input/vcf_lofreq/HapMap-B17-1267.vcf.gz") ],
-            // [ "LoFreq", "SeraCare-1to1", file("input/vcf_lofreq/SeraCare-1to1-Positive.vcf.gz") ],
-            // [ "HaplotypeCaller", "NTC-H2O", file("input/vcf_hc/NTC-H2O.vcf.gz") ],
-            // [ "HaplotypeCaller", "HapMap-B17-1267", file("input/vcf_hc/HapMap-B17-1267.vcf.gz") ],
-            // [ "HaplotypeCaller", "SeraCare-1to1", file("input/vcf_hc/SeraCare-1to1-Positive.vcf.gz") ]
+            ['LoFreq', 'SC-SERACARE', file("input/SC-SERACARE.LoFreq.vcf.gz")],
+            [ "LoFreq", "NTC-H2O", file("input/vcf_lofreq/NTC-H2O.vcf.gz") ],
+            [ "LoFreq", "HapMap-B17-1267", file("input/vcf_lofreq/HapMap-B17-1267.vcf.gz") ],
+            [ "LoFreq", "SeraCare-1to1-Positive", file("input/vcf_lofreq/SeraCare-1to1-Positive.vcf.gz") ],
+            [ "HaplotypeCaller", "NTC-H2O", file("input/vcf_hc/NTC-H2O.vcf.gz") ],
+            [ "HaplotypeCaller", "HapMap-B17-1267", file("input/vcf_hc/HapMap-B17-1267.vcf.gz") ],
+            [ "HaplotypeCaller", "SeraCare-1to1-Positive", file("input/vcf_hc/SeraCare-1to1-Positive.vcf.gz") ]
             ] )
         .set { sample_variants_zipped }
 
@@ -286,6 +286,8 @@ process annotate_vcf {
     // annotate the VCF file
     tag "${caller}-${sampleID}"
     publishDir "${params.output_dir}/${sampleID}/${caller}", mode: 'copy', overwrite: true
+    validExitStatus 0,11 // allow '11' failure triggered by few/no variants
+    errorStrategy 'ignore'
 
     input:
     set val(caller), val(sampleID), file(sample_vcf), file(sample_tsv), file(annovar_db_dir) from vcfs_tsvs_reformat.combine(annovar_db_dir)
@@ -293,8 +295,8 @@ process annotate_vcf {
     output:
     set val(caller), val(sampleID), file(sample_vcf), file(sample_tsv), file(annovar_output_txt), file("${sampleID}.avinput.tsv") into vcfs_tsvs_annotations
 
-    when:
-    caller == 'HaplotypeCaller'
+    // when:
+    // caller == 'HaplotypeCaller' || caller == 'LoFreq'
 
     script:
     avinput_file = "${sampleID}.avinput"
@@ -302,6 +304,9 @@ process annotate_vcf {
     annovar_output_vcf = "${sampleID}.${params.ANNOVAR_BUILD_VERSION}_multianno.vcf"
     if( caller == 'HaplotypeCaller' )
         """
+        # make sure there are variants present, by checking the .TSV file; should have >1 line
+        [ ! "\$( cat "${sample_tsv}" | wc -l )" -gt 1 ] && echo "ERROR: No variants present in ${sample_tsv}, skipping annotation..." && exit 11 || :
+
         # annovate
         table_annovar.pl "${sample_vcf}" "${annovar_db_dir}" \
         --buildver "${params.ANNOVAR_BUILD_VERSION}" \
@@ -313,9 +318,47 @@ process annotate_vcf {
         --onetranscript \
         --outfile "${sampleID}"
 
-        printf "Chr\tStart\tEnd\tRef\tAlt\tAF\tQUAL\tAD.ALT\tCHROM\tPOS\tID\tREF\tALT\n" > "${sampleID}.avinput.tsv"
-        cut -f1-13 ${avinput_file} >>  "${sampleID}.avinput.tsv"
+        printf "Chr\tStart\tEnd\tRef\tAlt\tAF\tQuality\tAD.ALT\tCHROM\tPOS\tID\tREF\tALT\tQUAL\n" > "${sampleID}.avinput.tsv"
+        cut -f1-14 ${avinput_file} >>  "${sampleID}.avinput.tsv"
         """
+    else if( caller == 'LoFreq' )
+        """
+        # make sure there are variants present, by checking the .TSV file; should have >1 line
+        [ ! "\$( cat "${sample_tsv}" | wc -l )" -gt 1 ] && echo "ERROR: No variants present in ${sample_tsv}, skipping annotation..." && exit 11 || :
+
+        table_annovar.pl "${sample_vcf}" "${annovar_db_dir}" \
+        --buildver "${params.ANNOVAR_BUILD_VERSION}" \
+        --remove \
+        --protocol "${params.ANNOVAR_PROTOCOL}" \
+        --operation "${params.ANNOVAR_OPERATION}" \
+        --nastring . \
+        --vcfinput \
+        --onetranscript \
+        --outfile "${sampleID}"
+
+        printf "Chr\tStart\tEnd\tRef\tAlt\tId\tQuality\tDP\tCHROM\tPOS\tID\tREF\tALT\tQUAL\n" > "${sampleID}.avinput.tsv"
+        cut -f1-14 ${avinput_file} >>  "${sampleID}.avinput.tsv"
+        """
+    else if( caller == 'MuTect2' )
+        """
+        # make sure there are variants present, by checking the .TSV file; should have >1 line
+        [ ! "\$( cat "${sample_tsv}" | wc -l )" -gt 1 ] && echo "ERROR: No variants present in ${sample_tsv}, skipping annotation..." && exit 11 || :
+
+        table_annovar.pl "${sample_vcf}" "${annovar_db_dir}" \
+        --buildver "${params.ANNOVAR_BUILD_VERSION}" \
+        --remove \
+        --protocol "${params.ANNOVAR_PROTOCOL}" \
+        --operation "${params.ANNOVAR_OPERATION}" \
+        --nastring . \
+        --vcfinput \
+        --onetranscript \
+        --outfile "${sampleID}"
+
+        printf "Chr\tStart\tEnd\tRef\tAlt\tId\tQuality\tDP\tCHROM\tPOS\tID\tREF\tALT\tQUAL\n" > "${sampleID}.avinput.tsv"
+        cut -f1-14 ${avinput_file} >>  "${sampleID}.avinput.tsv"
+        """
+    else
+        error "Invalid caller: ${caller}"
 }
 
 process merge_tables {
@@ -328,9 +371,6 @@ process merge_tables {
 
     output:
     set val(caller), val(sampleID), file("${sampleID}.annotations.tsv") into merged_tables
-
-    when:
-    caller == 'HaplotypeCaller'
 
     script:
     """
