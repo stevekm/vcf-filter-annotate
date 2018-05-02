@@ -291,16 +291,23 @@ process reformat_vcf_tsv {
         error "Invalid caller: ${caller}"
 }
 
+// make sure there are variants in the TSV
+import java.nio.file.Files;
+vcfs_tsvs_reformat.filter { caller, sampleID, sample_vcf, sample_tsv ->
+        long count = Files.lines(sample_tsv).count()
+        if (count <= 1) println ">>> WARNING: file ${sample_tsv} does not have enough lines and will not be included"
+        count > 1
+                    }
+                    .set { vcfs_tsvs_reformat_filtered }
+
 process annotate_vcf {
     // annotate the VCF file
     tag "${caller}-${sampleID}"
     publishDir "${params.output_dir}/samples/${sampleID}/${caller}", mode: 'copy', overwrite: true
     publishDir "${params.output_dir}/analysis/annotate_vcf", overwrite: true
-    validExitStatus 0,11 // allow '11' failure triggered by few/no variants
-    errorStrategy 'ignore'
 
     input:
-    set val(caller), val(sampleID), file(sample_vcf), file(sample_tsv), file(annovar_db_dir) from vcfs_tsvs_reformat.combine(annovar_db_dir)
+    set val(caller), val(sampleID), file(sample_vcf), file(sample_tsv), file(annovar_db_dir) from vcfs_tsvs_reformat_filtered.combine(annovar_db_dir)
 
     output:
     set val(caller), val(sampleID), file(sample_vcf), file(sample_tsv), file(annovar_output_txt), file("${prefix}.avinput.tsv") into vcfs_tsvs_annotations
@@ -313,7 +320,7 @@ process annotate_vcf {
     if( caller == 'HaplotypeCaller' )
         """
         # make sure there are variants present, by checking the .TSV file; should have >1 line
-        [ ! "\$( cat "${sample_tsv}" | wc -l )" -gt 1 ] && echo "ERROR: No variants present in ${sample_tsv}, skipping annotation..." && exit 11 || :
+        # [ ! "\$( cat "${sample_tsv}" | wc -l )" -gt 1 ] && echo "ERROR: No variants present in ${sample_tsv}, skipping annotation..." && exit 11 || :
 
         # annovate
         table_annovar.pl "${sample_vcf}" "${annovar_db_dir}" \
@@ -392,30 +399,30 @@ process merge_tables {
 
 }
 
-process tsv_2_sqlite {
-    // convert TSV files into SQLite databases
-    // NOTE: case-insensitive columns; 'Ref' and 'REF', one will get dropped...
-    tag "${caller}-${sampleID}"
-    publishDir "${params.output_dir}/samples/${sampleID}/${caller}", mode: 'copy', overwrite: true
-    publishDir "${params.output_dir}/analysis/tsv_2_sqlite", overwrite: true
-
-    input:
-    set val(caller), val(sampleID), file(sample_tsv) from merged_tables
-
-    output:
-    set val(caller), val(sampleID), file("${sqlite}") into samples_sqlite
-    file("${dump_csv}")
-    file("${dump_sqlite}")
-
-    script:
-    prefix = "${sampleID}.${caller}"
-    sqlite = "${prefix}.sqlite"
-    dump_csv = "${prefix}.sqlite.csv"
-    dump_sqlite = "${prefix}.sqlite.txt"
-    """
-    table2sqlite.py -i "${sample_tsv}" -o "${sqlite}" -t variants --dump-csv "${dump_csv}" --dump-sqlite "${dump_sqlite}"
-    """
-}
+// process tsv_2_sqlite {
+//     // convert TSV files into SQLite databases
+//     // NOTE: case-insensitive columns; 'Ref' and 'REF', one will get dropped...
+//     tag "${caller}-${sampleID}"
+//     publishDir "${params.output_dir}/samples/${sampleID}/${caller}", mode: 'copy', overwrite: true
+//     publishDir "${params.output_dir}/analysis/tsv_2_sqlite", overwrite: true
+//
+//     input:
+//     set val(caller), val(sampleID), file(sample_tsv) from merged_tables
+//
+//     output:
+//     set val(caller), val(sampleID), file("${sqlite}") into samples_sqlite
+//     file("${dump_csv}")
+//     file("${dump_sqlite}")
+//
+//     script:
+//     prefix = "${sampleID}.${caller}"
+//     sqlite = "${prefix}.sqlite"
+//     dump_csv = "${prefix}.sqlite.csv"
+//     dump_sqlite = "${prefix}.sqlite.txt"
+//     """
+//     table2sqlite.py -i "${sample_tsv}" -o "${sqlite}" -t variants --dump-csv "${dump_csv}" --dump-sqlite "${dump_sqlite}"
+//     """
+// }
 
 process collect_annotation_tables {
     publishDir "${params.output_dir}/analysis/collect_annotation_tables", mode: 'copy', overwrite: true
